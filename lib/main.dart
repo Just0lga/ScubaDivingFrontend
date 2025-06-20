@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -13,7 +15,7 @@ String? API_BASE_URL;
 void main() async {
   // Allow all certificates in development (DANGER! Do not use in production)
   HttpOverrides.global = MyHttpOverrides();
-  API_BASE_URL = 'https://192.168.104.232:7096';
+  API_BASE_URL = 'https://192.168.2.9:7096';
 
   runApp(const MyApp());
 }

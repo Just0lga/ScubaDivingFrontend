@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:scuba_diving/colors/color_palette.dart';
-import 'package:scuba_diving/screens/address_form_page.dart';
-import 'package:scuba_diving/screens/contact_info_page.dart'
+import 'package:scuba_diving/screens/profile%20items/address_form_page.dart';
+import 'package:scuba_diving/screens/profile%20items/contact_info_page.dart'
     show ContactInfoPage;
-import 'package:scuba_diving/screens/languages_page.dart';
+import 'package:scuba_diving/screens/forgot%20passwords/forgot_password_page.dart';
+import 'package:scuba_diving/screens/profile%20items/languages_page.dart';
 import 'package:scuba_diving/screens/login_page.dart';
-import 'package:scuba_diving/screens/my_orders_page.dart';
+import 'package:scuba_diving/screens/profile%20items/my_orders_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -29,11 +30,6 @@ class _ProfilePageState extends State<ProfilePage> {
           MaterialPageRoute(builder: (context) => MyOrdersPage()),
         );
       }),
-      ProfileItemModel(Icons.person_2_outlined, "Personal Informations", (
-        context,
-      ) {
-        // Kişisel bilgiler sayfasına yönlendirme
-      }),
       ProfileItemModel(Icons.language, "Languages", (context) {
         Navigator.push(
           context,
@@ -53,7 +49,10 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       }),
       ProfileItemModel(Icons.key_rounded, "Forgot Password", (context) {
-        // Şifre sıfırlama sayfasına yönlendirme (eğer uygulamanızda varsa)
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
+        );
       }),
       ProfileItemModel(Icons.logout_outlined, "Log Out", (context) async {
         final prefs = await SharedPreferences.getInstance();

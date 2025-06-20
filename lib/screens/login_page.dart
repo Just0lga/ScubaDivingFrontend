@@ -4,6 +4,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'dart:convert';
 import 'package:scuba_diving/colors/color_palette.dart';
 import 'package:scuba_diving/main.dart';
+import 'package:scuba_diving/screens/forgot%20passwords/forgot_password_page.dart';
 import 'package:scuba_diving/screens/register/register_page.dart';
 import 'package:scuba_diving/screens/main_page.dart';
 import 'package:scuba_diving/Widgets/scuba_text_field.dart';
@@ -232,7 +233,12 @@ class _LoginpageState extends State<Loginpage> {
             ),
             SizedBox(height: height * 0.005),
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
+                );
+              },
               child: Text(
                 "Forgot Password?",
                 style: Theme.of(

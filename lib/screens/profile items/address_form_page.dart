@@ -584,7 +584,11 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
                     ),
                     color: ColorPalette.cardColor,
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.only(
+                        left: 16.0,
+                        right: 16.0,
+                        top: 4,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -623,7 +627,6 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
                                 ),
                             ],
                           ),
-                          const SizedBox(height: 8),
                           Text(
                             address.fullAddress,
                             style: GoogleFonts.playfair(
@@ -645,7 +648,6 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
                               color: ColorPalette.black70,
                             ),
                           ),
-                          const SizedBox(height: 16),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [

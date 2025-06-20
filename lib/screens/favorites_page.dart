@@ -21,7 +21,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
   List<Product> _favoriteProducts = [];
   bool _isLoading = true;
   String? _currentUserId;
-  String? _authToken; // Auth token'ı da tutalım
+  String? _authToken;
 
   @override
   void initState() {
@@ -36,7 +36,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     _currentUserId = prefs.getString('userId');
-    _authToken = prefs.getString('authToken'); // Token'ı da al
+    _authToken = prefs.getString('authToken');
 
     if (_currentUserId != null && _authToken != null) {
       await _fetchFavoriteProducts(_currentUserId!);
@@ -55,10 +55,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
   }
 
   Future<void> _fetchFavoriteProducts(String userId) async {
-    // If we are already loading and there are items, we might want to prevent re-fetching
-    // Or if you want to refresh, remove this check.
-    // if (_isLoading && _favoriteProducts.isNotEmpty) return;
-
     if (_authToken == null) {
       setState(() {
         _isLoading = false;

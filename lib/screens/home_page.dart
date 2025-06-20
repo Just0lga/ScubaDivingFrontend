@@ -835,7 +835,11 @@ class _HomePageState extends State<HomePage> {
                   height: height * 0.23,
                   child:
                       _isLoadingTopViewed
-                          ? const Center(child: CircularProgressIndicator())
+                          ? const Center(
+                            child: CircularProgressIndicator(
+                              color: ColorPalette.primary,
+                            ),
+                          )
                           : _topViewedProducts.isEmpty && !_isLoadingTopViewed
                           ? const Center(
                             child: Text('En çok görüntülenen ürün bulunamadı.'),

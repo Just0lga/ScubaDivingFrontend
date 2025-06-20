@@ -3,13 +3,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:scuba_diving/colors/color_palette.dart';
 import 'package:scuba_diving/Widgets/scuba_title.dart';
+import 'package:scuba_diving/screens/payment_page.dart';
 import 'package:scuba_diving/screens/product_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:scuba_diving/models/product.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:scuba_diving/main.dart';
-import 'dart:math';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -523,19 +523,34 @@ class _CartPageState extends State<CartPage> {
                     ),
                   ),
                   SizedBox(width: width * 0.3),
-                  Container(
-                    width: width * 0.3,
-                    height: height * 0.05,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: ColorPalette.primary,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      "Pay Now",
-                      style: GoogleFonts.playfair(
-                        color: ColorPalette.white,
-                        fontSize: 16,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => PaymentPage(
+                                cartProducts: _cartProducts,
+                                cartProductQuantities: _cartProductQuantities,
+                                totalAmount: _calculateTotalPrice(),
+                              ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: width * 0.3,
+                      height: height * 0.05,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: ColorPalette.primary,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        "Pay Now",
+                        style: GoogleFonts.playfair(
+                          color: ColorPalette.white,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),
