@@ -27,7 +27,7 @@ class ContactInfoPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Contact Me',
-          style: GoogleFonts.playfair(
+          style: GoogleFonts.poppins(
             color: ColorPalette.white,
             fontWeight: FontWeight.bold,
           ),
@@ -52,7 +52,7 @@ class ContactInfoPage extends StatelessWidget {
             // Name
             Text(
               name,
-              style: GoogleFonts.playfair(
+              style: GoogleFonts.poppins(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
                 color: ColorPalette.black,
@@ -62,7 +62,7 @@ class ContactInfoPage extends StatelessWidget {
 
             Text(
               'Flutter Developer | Scuba Diver', // Your title/tagline
-              style: GoogleFonts.playfair(
+              style: GoogleFonts.poppins(
                 fontSize: 18,
                 color: ColorPalette.black70,
               ),
@@ -92,7 +92,7 @@ class ContactInfoPage extends StatelessWidget {
             // Social Media Links
             Text(
               'Find me on social media:',
-              style: GoogleFonts.playfair(
+              style: GoogleFonts.poppins(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: ColorPalette.black,
@@ -121,7 +121,7 @@ class ContactInfoPage extends StatelessWidget {
             const SizedBox(height: 24),
             Text(
               'Looking forward to connecting!',
-              style: GoogleFonts.playfair(
+              style: GoogleFonts.poppins(
                 fontSize: 16,
                 color: ColorPalette.black,
               ),
@@ -156,7 +156,7 @@ class ContactInfoPage extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: GoogleFonts.playfair(
+                    style: GoogleFonts.poppins(
                       fontSize: 14,
                       color: ColorPalette.black,
                     ),
@@ -164,7 +164,7 @@ class ContactInfoPage extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     value,
-                    style: GoogleFonts.playfair(
+                    style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: ColorPalette.black,

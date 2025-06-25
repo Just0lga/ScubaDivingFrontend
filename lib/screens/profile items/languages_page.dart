@@ -41,7 +41,7 @@ class _LanguagesPageState extends State<LanguagesPage> {
         ),
         title: Text(
           "Languages",
-          style: GoogleFonts.playfair(
+          style: GoogleFonts.poppins(
             color: ColorPalette.white,
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -58,7 +58,7 @@ class _LanguagesPageState extends State<LanguagesPage> {
           children: [
             Text(
               "Select your preferred language:",
-              style: GoogleFonts.playfair(
+              style: GoogleFonts.poppins(
                 color: ColorPalette.black,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -68,7 +68,7 @@ class _LanguagesPageState extends State<LanguagesPage> {
             ListTile(
               title: Text(
                 "English",
-                style: GoogleFonts.playfair(
+                style: GoogleFonts.poppins(
                   color: ColorPalette.black,
                   fontSize: 16,
                 ),
@@ -86,7 +86,7 @@ class _LanguagesPageState extends State<LanguagesPage> {
             SizedBox(height: height * 0.02),
             Text(
               "Sorry, we are working on adding new languages to the app.",
-              style: GoogleFonts.playfair(
+              style: GoogleFonts.poppins(
                 color: ColorPalette.black70,
                 fontSize: 14,
               ),

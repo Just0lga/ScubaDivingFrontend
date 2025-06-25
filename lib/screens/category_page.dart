@@ -8,6 +8,7 @@ import 'package:scuba_diving/main.dart';
 import 'package:scuba_diving/models/cart.dart';
 import 'package:scuba_diving/models/favorite.dart';
 import 'package:scuba_diving/models/product.dart';
+import 'package:scuba_diving/screens/picture/picture.dart';
 import 'package:scuba_diving/screens/product_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -442,10 +443,9 @@ class _CategoryPageState extends State<CategoryPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        // AppBar başlığı kategoriye özel olarak ayarlandı
         title: Text(
-          widget.categoryTitle, // Başlığı dinamik hale getirdik
-          style: GoogleFonts.playfair(
+          widget.categoryTitle,
+          style: GoogleFonts.poppins(
             color: ColorPalette.white,
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -512,7 +512,7 @@ class _CategoryPageState extends State<CategoryPage> {
                           color: ColorPalette.black,
                           width: 0.2,
                         ),
-                        color: ColorPalette.cardColor,
+                        color: ColorPalette.white,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -521,30 +521,17 @@ class _CategoryPageState extends State<CategoryPage> {
                             alignment: Alignment.topLeft,
                             children: [
                               Container(
-                                // Genişlik ve yükseklik ayarlarını koruyoruz, gerekirse buradan ayarlayabilirsiniz.
-                                width:
-                                    double
-                                        .infinity, // Kart genişliği kadar doldur
                                 height: height * 0.15,
                                 decoration: BoxDecoration(
-                                  color: Colors.green, // Placeholder renk
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(6),
-                                    topRight: Radius.circular(6),
+                                  color: Colors.transparent,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(6),
                                   ),
                                 ),
-                                alignment: Alignment.center,
-                                // Burası normalde resim yüklemek için kullanılmalıdır.
-                                // Şimdilik sadece URL metnini gösteriyoruz.
-                                child: Text(
-                                  product.mainPictureUrl.isEmpty
-                                      ? 'No Image'
-                                      : product.mainPictureUrl,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                  ),
+                                child: Picture(
+                                  baseUrl:
+                                      "https://scuba-diving-s3-bucket.s3.eu-north-1.amazonaws.com/products",
+                                  fileName: "${product.name}-1",
                                 ),
                               ),
                               // Favori kalp ikonu
@@ -573,7 +560,7 @@ class _CategoryPageState extends State<CategoryPage> {
                               children: [
                                 Text(
                                   "${product.price.toStringAsFixed(2)} \$",
-                                  style: GoogleFonts.playfair(
+                                  style: GoogleFonts.poppins(
                                     color: ColorPalette.black,
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
@@ -584,7 +571,7 @@ class _CategoryPageState extends State<CategoryPage> {
                                 SizedBox(height: height * 0.005),
                                 Text(
                                   product.name,
-                                  style: GoogleFonts.playfair(
+                                  style: GoogleFonts.poppins(
                                     color: ColorPalette.black,
                                     fontSize: 13,
                                   ),

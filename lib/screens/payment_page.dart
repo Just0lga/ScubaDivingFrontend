@@ -344,7 +344,7 @@ class _PaymentPageState extends State<PaymentPage> {
       appBar: AppBar(
         title: Text(
           "Payment", // Translated
-          style: GoogleFonts.playfair(
+          style: GoogleFonts.poppins(
             color: ColorPalette.white,
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -370,7 +370,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   children: [
                     Text(
                       "Select Delivery Address:", // Translated
-                      style: GoogleFonts.playfair(
+                      style: GoogleFonts.poppins(
                         color: ColorPalette.black,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -380,7 +380,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     _addresses.isEmpty
                         ? Text(
                           'No registered addresses found. Please add an address.', // Translated
-                          style: GoogleFonts.playfair(color: Colors.red),
+                          style: GoogleFonts.poppins(color: Colors.red),
                         )
                         : DropdownButtonFormField<int>(
                           value: _selectedAddressId,
@@ -390,7 +390,7 @@ class _PaymentPageState extends State<PaymentPage> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             labelText: 'Select Address', // Translated
-                            labelStyle: GoogleFonts.playfair(
+                            labelStyle: GoogleFonts.poppins(
                               color: ColorPalette.black70,
                             ),
                             prefixIcon: Icon(
@@ -414,7 +414,7 @@ class _PaymentPageState extends State<PaymentPage> {
                                     '${address.title} - ${address.fullAddress}',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.playfair(
+                                    style: GoogleFonts.poppins(
                                       color: ColorPalette.black,
                                     ),
                                   ),
@@ -425,7 +425,7 @@ class _PaymentPageState extends State<PaymentPage> {
                               _selectedAddressId = newValue;
                             });
                           },
-                          style: GoogleFonts.playfair(
+                          style: GoogleFonts.poppins(
                             color: ColorPalette.black,
                             fontSize: 16,
                           ),
@@ -434,7 +434,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     SizedBox(height: height * 0.03),
                     Text(
                       "Cart Summary:", // Translated
-                      style: GoogleFonts.playfair(
+                      style: GoogleFonts.poppins(
                         color: ColorPalette.black,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -457,7 +457,7 @@ class _PaymentPageState extends State<PaymentPage> {
                               Expanded(
                                 child: Text(
                                   '${product.name} x$quantity',
-                                  style: GoogleFonts.playfair(
+                                  style: GoogleFonts.poppins(
                                     color: ColorPalette.black,
                                   ),
                                   overflow: TextOverflow.ellipsis,
@@ -465,7 +465,7 @@ class _PaymentPageState extends State<PaymentPage> {
                               ),
                               Text(
                                 '${(product.price * quantity).toStringAsFixed(2)} \$',
-                                style: GoogleFonts.playfair(
+                                style: GoogleFonts.poppins(
                                   color: ColorPalette.black,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -483,7 +483,7 @@ class _PaymentPageState extends State<PaymentPage> {
                         children: [
                           Text(
                             "Total Amount:", // Translated
-                            style: GoogleFonts.playfair(
+                            style: GoogleFonts.poppins(
                               color: ColorPalette.black,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -491,7 +491,7 @@ class _PaymentPageState extends State<PaymentPage> {
                           ),
                           Text(
                             '${widget.totalAmount.toStringAsFixed(2)} \$',
-                            style: GoogleFonts.playfair(
+                            style: GoogleFonts.poppins(
                               color: ColorPalette.primary,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -503,7 +503,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     SizedBox(height: height * 0.03),
                     Text(
                       "Payment Information:", // Translated
-                      style: GoogleFonts.playfair(
+                      style: GoogleFonts.poppins(
                         color: ColorPalette.black,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -595,7 +595,7 @@ class _PaymentPageState extends State<PaymentPage> {
                         ),
                         child: Text(
                           "Complete Payment", // Translated
-                          style: GoogleFonts.playfair(
+                          style: GoogleFonts.poppins(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),

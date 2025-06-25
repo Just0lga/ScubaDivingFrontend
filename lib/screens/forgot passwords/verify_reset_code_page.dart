@@ -127,16 +127,20 @@ class _VerifyResetCodePageState extends State<VerifyResetCodePage> {
       appBar: AppBar(
         title: Text(
           "Reset Password",
-          style: GoogleFonts.playfair(
-            color: ColorPalette.white,
-            fontSize: 24,
+          style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
+            color: ColorPalette.white,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.black,
+        backgroundColor: ColorPalette.black,
         elevation: 0,
-        iconTheme: IconThemeData(color: ColorPalette.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: ColorPalette.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(width * 0.05),
@@ -146,7 +150,7 @@ class _VerifyResetCodePageState extends State<VerifyResetCodePage> {
             Text(
               "Enter the code sent to your email and your new password.",
               textAlign: TextAlign.center,
-              style: GoogleFonts.playfair(
+              style: GoogleFonts.poppins(
                 color: ColorPalette.black,
                 fontSize: 16,
               ),
@@ -212,7 +216,7 @@ class _VerifyResetCodePageState extends State<VerifyResetCodePage> {
                   ),
                   child: Text(
                     "Reset Password",
-                    style: GoogleFonts.playfair(
+                    style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),

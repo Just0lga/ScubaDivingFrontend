@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:scuba_diving/screens/product_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart'; // Tarih formatlama için
 
@@ -131,7 +132,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       appBar: AppBar(
         title: Text(
           'Order #${widget.order.id} Details',
-          style: GoogleFonts.playfair(
+          style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             color: ColorPalette.white,
           ),
@@ -158,7 +159,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   child: Text(
                     _errorMessage,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.playfair(
+                    style: GoogleFonts.poppins(
                       color: ColorPalette.error,
                       fontSize: 16,
                     ),
@@ -175,7 +176,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       children: [
                         Text(
                           'Order Status: ${widget.order.status.toUpperCase()}',
-                          style: GoogleFonts.playfair(
+                          style: GoogleFonts.poppins(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: ColorPalette.black,
@@ -184,7 +185,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         const SizedBox(height: 8),
                         Text(
                           'Total Amount: \$${widget.order.totalAmount.toStringAsFixed(2)}',
-                          style: GoogleFonts.playfair(
+                          style: GoogleFonts.poppins(
                             fontSize: 16,
                             color: ColorPalette.black70,
                           ),
@@ -192,7 +193,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         const SizedBox(height: 4),
                         Text(
                           'Order Date: ${DateFormat('dd/MM/yyyy HH:mm').format(widget.order.createdAt)}',
-                          style: GoogleFonts.playfair(
+                          style: GoogleFonts.poppins(
                             fontSize: 14,
                             color: ColorPalette.black70.withOpacity(0.7),
                           ),
@@ -200,7 +201,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         const SizedBox(height: 16),
                         Text(
                           'Order Items:',
-                          style: GoogleFonts.playfair(
+                          style: GoogleFonts.poppins(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: ColorPalette.black,
@@ -215,7 +216,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                             ? Center(
                               child: Text(
                                 'No items found for this order.',
-                                style: GoogleFonts.playfair(
+                                style: GoogleFonts.poppins(
                                   fontSize: 16,
                                   color: ColorPalette.black70,
                                 ),
@@ -228,58 +229,70 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                               itemCount: _orderItems.length,
                               itemBuilder: (context, index) {
                                 final item = _orderItems[index];
-                                return Card(
-                                  margin: const EdgeInsets.only(bottom: 10.0),
-                                  elevation: 2,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  color: ColorPalette.white,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: Row(
-                                      children: [
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                item.name,
-                                                style: GoogleFonts.playfair(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: ColorPalette.black,
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                                ProductPage(productId: item.id),
+                                      ),
+                                    );
+                                  },
+                                  child: Card(
+                                    margin: const EdgeInsets.only(bottom: 10.0),
+                                    elevation: 2,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    color: ColorPalette.white,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Row(
+                                        children: [
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  item.name,
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: ColorPalette.black,
+                                                  ),
                                                 ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                'Quantity: ${item.quantity}',
-                                                style: GoogleFonts.playfair(
-                                                  fontSize: 14,
-                                                  color: ColorPalette.black70,
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  'Quantity: ${item.quantity}',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: 14,
+                                                    color: ColorPalette.black70,
+                                                  ),
                                                 ),
-                                              ),
-                                              Text(
-                                                'Price: \$${item.price.toStringAsFixed(2)} each',
-                                                style: GoogleFonts.playfair(
-                                                  fontSize: 14,
-                                                  color: ColorPalette.black70,
+                                                Text(
+                                                  'Price: \$${item.price.toStringAsFixed(2)} each',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: 14,
+                                                    color: ColorPalette.black70,
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          '\$${(item.quantity * item.price).toStringAsFixed(2)}',
-                                          style: GoogleFonts.playfair(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: ColorPalette.primary,
+                                          Text(
+                                            '\$${(item.quantity * item.price).toStringAsFixed(2)}',
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: ColorPalette.primary,
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 );

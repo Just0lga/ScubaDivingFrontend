@@ -87,14 +87,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: ColorPalette.black,
           title: Text(
             "Profile",
-            style: GoogleFonts.playfair(
-              color: ColorPalette.white,
-              fontSize: 24,
-            ),
+            style: GoogleFonts.poppins(color: ColorPalette.white, fontSize: 24),
           ),
           centerTitle: true,
         ),
@@ -170,7 +168,7 @@ class ProfileItem extends StatelessWidget {
                       SizedBox(width: width * 0.02),
                       Text(
                         title,
-                        style: GoogleFonts.playfair(
+                        style: GoogleFonts.poppins(
                           color: ColorPalette.black,
                           fontSize: 20,
                         ),

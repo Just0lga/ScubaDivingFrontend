@@ -8,6 +8,7 @@ import 'package:scuba_diving/main.dart';
 import 'package:scuba_diving/models/product.dart';
 import 'package:scuba_diving/models/cart.dart'; // Sepet modeli import edildi
 import 'package:scuba_diving/models/favorite.dart'; // Favori modeli import edildi
+import 'package:scuba_diving/screens/picture/picture.dart';
 import 'package:scuba_diving/screens/product_page.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Ürün detay sayfası için
 
@@ -434,7 +435,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
           controller: _searchController,
           decoration: InputDecoration(
             hintText: 'Search...',
-            hintStyle: GoogleFonts.playfair(color: ColorPalette.black70),
+            hintStyle: GoogleFonts.poppins(color: ColorPalette.black70),
             border: InputBorder.none,
             suffixIcon:
                 _isLoading
@@ -456,7 +457,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                       },
                     ),
           ),
-          style: GoogleFonts.playfair(color: ColorPalette.black, fontSize: 18),
+          style: GoogleFonts.poppins(color: ColorPalette.black, fontSize: 18),
           onSubmitted: (value) {
             _searchProducts(value); // Enter'a basıldığında ara
           },
@@ -514,7 +515,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                           color: ColorPalette.black,
                           width: 0.2,
                         ),
-                        color: ColorPalette.cardColor, // Kart arka plan rengi
+                        color: ColorPalette.white, // Kart arka plan rengi
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -528,24 +529,17 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                                   topRight: Radius.circular(6),
                                 ),
                                 child: Container(
-                                  width:
-                                      double
-                                          .infinity, // Resim alanı kart genişliği kadar
                                   height: height * 0.15,
-                                  color: Colors.yellow[200], // Placeholder renk
-                                  alignment: Alignment.center,
-                                  // TODO: Burada gerçek resmi yüklemek için Image.network kullanılmalıdır.
-                                  // product.mainPictureUrl eğer geçerli bir URL ise:
-                                  // child: Image.network(product.mainPictureUrl, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => Text('Resim Yok')),
-                                  child: Text(
-                                    product.mainPictureUrl.isEmpty
-                                        ? 'No Image'
-                                        : 'Image for: ${product.name}', // Geçici olarak resim URL'si veya placeholder metin
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Colors.black54,
-                                      fontSize: 10,
+                                  decoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(6),
                                     ),
+                                  ),
+                                  child: Picture(
+                                    baseUrl:
+                                        "https://scuba-diving-s3-bucket.s3.eu-north-1.amazonaws.com/products",
+                                    fileName: "${product.name}-1",
                                   ),
                                 ),
                               ),
@@ -576,7 +570,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                               children: [
                                 Text(
                                   "${product.price.toStringAsFixed(2)} \$",
-                                  style: GoogleFonts.playfair(
+                                  style: GoogleFonts.poppins(
                                     color: ColorPalette.black,
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
@@ -587,7 +581,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                                 SizedBox(height: height * 0.005),
                                 Text(
                                   product.name,
-                                  style: GoogleFonts.playfair(
+                                  style: GoogleFonts.poppins(
                                     color: ColorPalette.black,
                                     fontSize: 13,
                                   ),

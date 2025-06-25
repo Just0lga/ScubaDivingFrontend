@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -7,6 +8,9 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:scuba_diving/colors/color_palette.dart';
 import 'package:scuba_diving/main.dart';
 import 'package:scuba_diving/models/product.dart';
+import 'package:scuba_diving/models/review.dart';
+import 'package:scuba_diving/screens/picture/picture.dart';
+import 'package:scuba_diving/screens/product_comments_page.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // SharedPreferences için eklendi
 
 class ProductPage extends StatefulWidget {
@@ -29,6 +33,77 @@ class _ProductPageState extends State<ProductPage> {
   Set<int> _cartProductIds = {};
   bool _isFavorite = false; // Mevcut ürün favori mi?
   bool _isInCart = false; // Mevcut ürün sepette mi?
+  double _averageRating = 0.0;
+  int _reviewCount = 0;
+
+  List<Review> _reviews = [];
+
+  Future<void> _fetchProductReviews() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+    try {
+      final response = await http
+          .get(
+            Uri.parse('$API_BASE_URL/api/Review/product/${widget.productId}'),
+          )
+          .timeout(const Duration(seconds: 10)); // Zaman aşımı eklendi
+
+      if (response.statusCode == 200) {
+        final List<dynamic> reviewJsonList = json.decode(response.body);
+        if (mounted) {
+          setState(() {
+            _reviews =
+                reviewJsonList.map((json) => Review.fromJson(json)).toList();
+            _calculateReviewStats();
+            _isLoading = false;
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _errorMessage = 'Failed to load reviews: ${response.statusCode}';
+            _isLoading = false;
+          });
+        }
+        print(
+          'Reviews fetch failed: ${response.statusCode} - ${response.body}',
+        );
+      }
+    } on TimeoutException catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Reviews request timed out: $e';
+          _isLoading = false;
+        });
+      }
+      print('Timeout fetching reviews: $e');
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Error fetching reviews: $e';
+          _isLoading = false;
+        });
+      }
+      print('Network error fetching reviews: $e');
+    }
+  }
+
+  void _calculateReviewStats() {
+    if (_reviews.isEmpty) {
+      _averageRating = 0.0;
+      _reviewCount = 0;
+      return;
+    }
+
+    double totalRating = 0;
+    for (var review in _reviews) {
+      totalRating += review.rating.toDouble();
+    }
+    _averageRating = totalRating / _reviews.length;
+    _reviewCount = _reviews.length;
+  }
 
   @override
   void initState() {
@@ -36,6 +111,7 @@ class _ProductPageState extends State<ProductPage> {
     _fetchProductDetails();
     _loadUserDataAndFavorites(); // Favorileri çek
     _loadUserDataAndCartItems(); // Sepet öğelerini çek
+    _fetchProductReviews();
   }
 
   // Kullanıcı ID'sini yükle ve favorileri çek
@@ -344,6 +420,7 @@ class _ProductPageState extends State<ProductPage> {
 
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white,
         body:
             _isLoading
                 ? Center(
@@ -398,19 +475,22 @@ class _ProductPageState extends State<ProductPage> {
                         ],
                       ),
                       SizedBox(height: 8),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(
-                          "images/freediving.jpg", // Use the image from the product model
-                          width: double.infinity,
-                          height: height * 0.3,
-                          fit: BoxFit.cover,
+                      Container(
+                        height: height * 0.4,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.all(Radius.circular(6)),
+                        ),
+                        child: Picture(
+                          baseUrl:
+                              "https://scuba-diving-s3-bucket.s3.eu-north-1.amazonaws.com/products",
+                          fileName: "${_product?.name}-1",
                         ),
                       ),
                       SizedBox(height: 8),
                       Text(
                         _product!.name,
-                        style: GoogleFonts.playfair(
+                        style: GoogleFonts.poppins(
                           color: ColorPalette.black,
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -430,53 +510,65 @@ class _ProductPageState extends State<ProductPage> {
                             alignment: Alignment.center,
                             child: RatingBar.builder(
                               itemSize: 16,
-                              initialRating:
-                                  _product!.id
-                                      .toDouble() ?? // This likely should be product.rating, not product.id
-                                  0.0, // Backend'den gelen rating'i kullan
-                              minRating: 1,
+                              initialRating: _averageRating,
+                              minRating: 0,
                               direction: Axis.horizontal,
                               allowHalfRating: true,
                               itemCount: 5,
-                              itemPadding: EdgeInsets.symmetric(
+                              itemPadding: const EdgeInsets.symmetric(
                                 horizontal: 4.0,
                               ),
                               itemBuilder:
-                                  (context, _) =>
-                                      Icon(Icons.star, color: Colors.amber),
-                              onRatingUpdate: (rating) {
-                                print(rating);
-                              },
+                                  (context, _) => const Icon(
+                                    Icons.star,
+                                    color: Colors.amber,
+                                  ),
+                              onRatingUpdate: (rating) {},
+                              ignoreGestures: true,
                             ),
                           ),
                           SizedBox(width: 8),
-                          Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(6),
-                              color: ColorPalette.cardColor,
-                            ),
-                            width: width * 0.45,
-                            height: height * 0.05,
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 12),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Text(
-                                    "Show the comments",
-                                    style: GoogleFonts.playfair(
-                                      fontSize: 12,
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => ProductCommentsPage(
+                                        productId: _product?.id ?? 0,
+                                        productName: _product?.name ?? "",
+                                      ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(6),
+                                color: ColorPalette.cardColor,
+                              ),
+                              width: width * 0.45,
+                              height: height * 0.05,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 12),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Text(
+                                      "Show the comments",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 10,
+                                        color: ColorPalette.primary,
+                                      ),
+                                    ),
+                                    SizedBox(width: 4),
+                                    Icon(
+                                      Icons.comment,
                                       color: ColorPalette.primary,
                                     ),
-                                  ),
-                                  SizedBox(width: 4),
-                                  Icon(
-                                    Icons.comment,
-                                    color: ColorPalette.primary,
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -499,7 +591,7 @@ class _ProductPageState extends State<ProductPage> {
                               children: [
                                 Text(
                                   "${_product!.favoriteCount ?? 0}", // Null kontrolü ekleyin
-                                  style: GoogleFonts.playfair(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 20,
                                     color: Colors.red,
                                   ),
@@ -523,7 +615,7 @@ class _ProductPageState extends State<ProductPage> {
                               children: [
                                 Text(
                                   "${_product!.reviewCount ?? 0}", // Null kontrolü ekleyin
-                                  style: GoogleFonts.playfair(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 20,
                                     color: Colors.grey[700],
                                   ),
@@ -538,7 +630,7 @@ class _ProductPageState extends State<ProductPage> {
                       SizedBox(height: height * 0.01),
                       Text(
                         '\$${_product!.price.toStringAsFixed(2)}',
-                        style: GoogleFonts.playfair(
+                        style: GoogleFonts.poppins(
                           color: ColorPalette.black,
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -547,7 +639,7 @@ class _ProductPageState extends State<ProductPage> {
                       SizedBox(height: height * 0.01),
                       Text(
                         'Brand: ${_product!.brand}',
-                        style: GoogleFonts.playfair(
+                        style: GoogleFonts.poppins(
                           color: ColorPalette.black,
                           fontSize: 18,
                         ),
@@ -557,7 +649,7 @@ class _ProductPageState extends State<ProductPage> {
                         _product!.description ?? "",
                         maxLines: 10,
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.playfair(
+                        style: GoogleFonts.poppins(
                           color: ColorPalette.black70,
                           fontSize: 16,
                         ),
@@ -571,7 +663,7 @@ class _ProductPageState extends State<ProductPage> {
                           children: [
                             Text(
                               'Features',
-                              style: GoogleFonts.playfair(
+                              style: GoogleFonts.poppins(
                                 color: ColorPalette.black,
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
@@ -593,7 +685,7 @@ class _ProductPageState extends State<ProductPage> {
                                     Expanded(
                                       child: Text(
                                         '${entry.key}: ${entry.value}',
-                                        style: GoogleFonts.playfair(
+                                        style: GoogleFonts.poppins(
                                           fontSize: 16,
                                           color: ColorPalette.black,
                                         ),
@@ -626,7 +718,7 @@ class _ProductPageState extends State<ProductPage> {
                             _isInCart
                                 ? "In Cart"
                                 : "Add to cart", // Sepetteyse metni değiştir
-                            style: GoogleFonts.playfair(
+                            style: GoogleFonts.poppins(
                               fontSize: 20,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,

@@ -137,7 +137,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
       appBar: AppBar(
         title: Text(
           'My Orders',
-          style: GoogleFonts.playfair(
+          style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             color: ColorPalette.white,
           ),
@@ -164,7 +164,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
                   child: Text(
                     _errorMessage,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.playfair(
+                    style: GoogleFonts.poppins(
                       color: ColorPalette.error,
                       fontSize: 16,
                     ),
@@ -175,7 +175,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
               ? Center(
                 child: Text(
                   'You have no orders yet.',
-                  style: GoogleFonts.playfair(
+                  style: GoogleFonts.poppins(
                     fontSize: 18,
                     color: ColorPalette.black70,
                   ),
@@ -213,7 +213,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
                               children: [
                                 Text(
                                   'Order #${order.id}',
-                                  style: GoogleFonts.playfair(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                     color: ColorPalette.black,
@@ -232,7 +232,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
                                   ),
                                   child: Text(
                                     order.status.toUpperCase(),
-                                    style: GoogleFonts.playfair(
+                                    style: GoogleFonts.poppins(
                                       color: _getStatusColor(order.status),
                                       fontWeight: FontWeight.bold,
                                       fontSize: 12,
@@ -244,7 +244,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
                             const SizedBox(height: 8),
                             Text(
                               'Total: \$${order.totalAmount.toStringAsFixed(2)}',
-                              style: GoogleFonts.playfair(
+                              style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 color: ColorPalette.black70,
                               ),
@@ -252,7 +252,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
                             const SizedBox(height: 4),
                             Text(
                               'Date: ${DateFormat('dd/MM/yyyy HH:mm').format(order.createdAt)}',
-                              style: GoogleFonts.playfair(
+                              style: GoogleFonts.poppins(
                                 fontSize: 14,
                                 color: ColorPalette.black70.withOpacity(0.7),
                               ),
@@ -261,7 +261,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
                               const SizedBox(height: 4),
                               Text(
                                 'Last Updated: ${DateFormat('dd/MM/yyyy HH:mm').format(order.updatedAt!)}',
-                                style: GoogleFonts.playfair(
+                                style: GoogleFonts.poppins(
                                   fontSize: 13,
                                   color: ColorPalette.black70.withOpacity(0.6),
                                 ),

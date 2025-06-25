@@ -21,12 +21,9 @@ Category _$CategoryFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Category {
-  int? get id =>
-      throw _privateConstructorUsedError; // C# tarafındaki `[Required]` karşılığıdır, bu alanın her zaman dolu olması gerekir.
-  String get name =>
-      throw _privateConstructorUsedError; // C# tarafındaki `int? ParentId` karşılığıdır, bir üst kategori olmayabilir.
-  int? get parentId =>
-      throw _privateConstructorUsedError; // C# tarafındaki `string Image` karşılığıdır, null veya boş olabilir.
+  int? get id => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  int? get parentId => throw _privateConstructorUsedError;
   String? get image => throw _privateConstructorUsedError;
 
   /// Serializes this Category to a JSON map.
@@ -168,13 +165,10 @@ class _$CategoryImpl implements _Category {
 
   @override
   final int? id;
-  // C# tarafındaki `[Required]` karşılığıdır, bu alanın her zaman dolu olması gerekir.
   @override
   final String name;
-  // C# tarafındaki `int? ParentId` karşılığıdır, bir üst kategori olmayabilir.
   @override
   final int? parentId;
-  // C# tarafındaki `string Image` karşılığıdır, null veya boş olabilir.
   @override
   final String? image;
 
@@ -225,11 +219,11 @@ abstract class _Category implements Category {
       _$CategoryImpl.fromJson;
 
   @override
-  int? get id; // C# tarafındaki `[Required]` karşılığıdır, bu alanın her zaman dolu olması gerekir.
+  int? get id;
   @override
-  String get name; // C# tarafındaki `int? ParentId` karşılığıdır, bir üst kategori olmayabilir.
+  String get name;
   @override
-  int? get parentId; // C# tarafındaki `string Image` karşılığıdır, null veya boş olabilir.
+  int? get parentId;
   @override
   String? get image;
 

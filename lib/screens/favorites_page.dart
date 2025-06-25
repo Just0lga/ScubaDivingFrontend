@@ -7,6 +7,7 @@ import 'package:scuba_diving/colors/color_palette.dart';
 import 'package:scuba_diving/main.dart'; // API_BASE_URL için
 import 'package:scuba_diving/models/favorite.dart';
 import 'package:scuba_diving/models/product.dart';
+import 'package:scuba_diving/screens/picture/picture.dart';
 import 'package:scuba_diving/screens/product_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -302,14 +303,12 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: ColorPalette.black,
           title: Text(
             "Favorites",
-            style: GoogleFonts.playfair(
-              color: ColorPalette.white,
-              fontSize: 24,
-            ),
+            style: GoogleFonts.poppins(color: ColorPalette.white, fontSize: 24),
           ),
           centerTitle: true,
         ),
@@ -328,7 +327,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                       _currentUserId == null
                           ? 'Favori ürünleri görmek için giriş yapın.'
                           : 'Henüz favori ürününüz bulunmamaktadır.',
-                      style: GoogleFonts.playfair(
+                      style: GoogleFonts.poppins(
                         color: ColorPalette.black,
                         fontSize: 18,
                       ),
@@ -411,7 +410,7 @@ class FavoriteProductItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: height * 0.15,
-      color: ColorPalette.cardColor,
+      color: Colors.white,
       child: Row(
         children: [
           Padding(
@@ -420,12 +419,13 @@ class FavoriteProductItem extends StatelessWidget {
               alignment: Alignment.center,
               width: width * 0.3,
               decoration: BoxDecoration(
-                color: Colors.grey,
+                color: Colors.transparent,
                 borderRadius: BorderRadius.circular(6),
-                image: DecorationImage(
-                  image: AssetImage(imagePath),
-                  fit: BoxFit.cover,
-                ),
+              ),
+              child: Picture(
+                baseUrl:
+                    "https://scuba-diving-s3-bucket.s3.eu-north-1.amazonaws.com/products",
+                fileName: "${product.name}-1",
               ),
             ),
           ),
@@ -442,7 +442,7 @@ class FavoriteProductItem extends StatelessWidget {
                         product.name,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        style: GoogleFonts.playfair(
+                        style: GoogleFonts.poppins(
                           color: ColorPalette.black,
                           fontSize: 16,
                         ),
@@ -459,7 +459,7 @@ class FavoriteProductItem extends StatelessWidget {
                 ),
                 Text(
                   "${product.price.toStringAsFixed(2)} \$",
-                  style: GoogleFonts.playfair(
+                  style: GoogleFonts.poppins(
                     color: ColorPalette.black,
                     fontSize: 16,
                   ),
@@ -484,7 +484,7 @@ class FavoriteProductItem extends StatelessWidget {
                           ),
                           child: Text(
                             "Add to Cart",
-                            style: GoogleFonts.playfair(
+                            style: GoogleFonts.poppins(
                               color: ColorPalette.white,
                               fontSize: 16,
                             ),

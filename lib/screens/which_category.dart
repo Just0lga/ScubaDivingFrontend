@@ -84,7 +84,7 @@ class _WhichCategoryState extends State<WhichCategory> {
         ),
         title: Text(
           widget.CategoryName,
-          style: GoogleFonts.playfair(color: ColorPalette.white, fontSize: 24),
+          style: GoogleFonts.poppins(color: ColorPalette.white, fontSize: 24),
         ),
         centerTitle: true,
       ),
@@ -167,7 +167,7 @@ class CategoryItem extends StatelessWidget {
                       SizedBox(width: width * 0.02),
                       Text(
                         title,
-                        style: GoogleFonts.playfair(
+                        style: GoogleFonts.poppins(
                           color: ColorPalette.black,
                           fontSize: 20,
                         ),

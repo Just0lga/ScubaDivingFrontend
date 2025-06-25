@@ -171,7 +171,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
       appBar: AppBar(
         title: Text(
           widget.address == null ? 'Add New Address' : 'Edit Address',
-          style: GoogleFonts.playfair(
+          style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             color: ColorPalette.white,
           ),
@@ -182,7 +182,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: ColorPalette.white),
           onPressed: () {
-            widget.onSave(false); // No refresh needed if cancelled
+            widget.onSave(false);
             Navigator.pop(context);
           },
         ),
@@ -233,7 +233,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
               SwitchListTile(
                 title: Text(
                   'Set as Default Address',
-                  style: GoogleFonts.playfair(
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
                     color: ColorPalette.black,
                   ),
@@ -263,7 +263,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
                     ),
                     child: Text(
                       widget.address == null ? 'Add Address' : 'Update Address',
-                      style: GoogleFonts.playfair(
+                      style: GoogleFonts.poppins(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -286,10 +286,10 @@ class _AddressFormPageState extends State<AddressFormPage> {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
-      style: GoogleFonts.playfair(color: ColorPalette.black),
+      style: GoogleFonts.poppins(color: ColorPalette.black),
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: GoogleFonts.playfair(color: ColorPalette.black70),
+        labelStyle: GoogleFonts.poppins(color: ColorPalette.black70),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: ColorPalette.black70),
@@ -510,7 +510,7 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
       appBar: AppBar(
         title: Text(
           'My Addresses',
-          style: GoogleFonts.playfair(
+          style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             color: ColorPalette.white,
           ),
@@ -554,7 +554,7 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
                   child: Text(
                     _errorMessage,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.playfair(
+                    style: GoogleFonts.poppins(
                       color: ColorPalette.error,
                       fontSize: 16,
                     ),
@@ -565,7 +565,7 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
               ? Center(
                 child: Text(
                   'No addresses found. Add a new one!',
-                  style: GoogleFonts.playfair(
+                  style: GoogleFonts.poppins(
                     fontSize: 18,
                     color: ColorPalette.black70,
                   ),
@@ -597,7 +597,7 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
                               Expanded(
                                 child: Text(
                                   address.title,
-                                  style: GoogleFonts.playfair(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
                                     color: ColorPalette.black,
@@ -618,7 +618,7 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
                                   ),
                                   child: Text(
                                     'Default',
-                                    style: GoogleFonts.playfair(
+                                    style: GoogleFonts.poppins(
                                       color: ColorPalette.primary,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 12,
@@ -629,21 +629,21 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
                           ),
                           Text(
                             address.fullAddress,
-                            style: GoogleFonts.playfair(
+                            style: GoogleFonts.poppins(
                               fontSize: 16,
                               color: ColorPalette.black70,
                             ),
                           ),
                           Text(
                             '${address.city}, ${address.state} ${address.zipcode}',
-                            style: GoogleFonts.playfair(
+                            style: GoogleFonts.poppins(
                               fontSize: 16,
                               color: ColorPalette.black70,
                             ),
                           ),
                           Text(
                             address.country,
-                            style: GoogleFonts.playfair(
+                            style: GoogleFonts.poppins(
                               fontSize: 16,
                               color: ColorPalette.black70,
                             ),

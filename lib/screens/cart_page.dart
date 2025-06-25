@@ -4,6 +4,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:scuba_diving/colors/color_palette.dart';
 import 'package:scuba_diving/Widgets/scuba_title.dart';
 import 'package:scuba_diving/screens/payment_page.dart';
+import 'package:scuba_diving/screens/picture/picture.dart';
 import 'package:scuba_diving/screens/product_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:scuba_diving/models/product.dart';
@@ -304,14 +305,12 @@ class _CartPageState extends State<CartPage> {
 
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: ColorPalette.black,
           title: Text(
             "Cart",
-            style: GoogleFonts.playfair(
-              color: ColorPalette.white,
-              fontSize: 24,
-            ),
+            style: GoogleFonts.poppins(color: ColorPalette.white, fontSize: 24),
           ),
           centerTitle: true,
           iconTheme: IconThemeData(color: Colors.white),
@@ -334,7 +333,7 @@ class _CartPageState extends State<CartPage> {
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
                       'Sepetinizde ürün bulunmamaktadır.',
-                      style: GoogleFonts.playfair(fontSize: 16),
+                      style: GoogleFonts.poppins(fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
                   )
@@ -363,7 +362,164 @@ class _CartPageState extends State<CartPage> {
                                 ),
                               );
                             },
-                            child: CartItem(
+
+                            child: Container(
+                              color: ColorPalette.white,
+                              height:
+                                  height *
+                                  0.15, // Bu yükseklik, içeriğinize uygun olmalı
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                                horizontal: 8.0,
+                              ), // İç padding ekledik
+                              child: Row(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment
+                                        .start, // Ürün başlığı yukarıda hizalansın
+                                children: [
+                                  // Ürün Resmi
+                                  Container(
+                                    width:
+                                        width *
+                                        0.25, // Genişliği biraz azalttık
+                                    decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Picture(
+                                      baseUrl:
+                                          "https://scuba-diving-s3-bucket.s3.eu-north-1.amazonaws.com/products",
+                                      fileName: "${product.name}-1",
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: width * 0.03,
+                                  ), // Resmi sağdan biraz daha ayırdık
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment
+                                              .spaceBetween, // İçerikleri dikeyde yay
+                                      children: [
+                                        // Ürün Başlığı ve Silme Butonu
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment
+                                                  .start, // Başlık ve ikon aynı hizada
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                product.name,
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines:
+                                                    2, // İki satıra kadar sığdır
+                                                style: GoogleFonts.poppins(
+                                                  color: ColorPalette.black,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+                                            IconButton(
+                                              onPressed:
+                                                  () => _removeCartItem(
+                                                    product.id,
+                                                  ),
+                                              icon: Icon(
+                                                Icons.delete_outline,
+                                                color: ColorPalette.black,
+                                                size:
+                                                    20, // İkon boyutunu biraz küçülttük
+                                              ),
+                                              padding:
+                                                  EdgeInsets
+                                                      .zero, // Padding'i kaldırdık
+                                              constraints:
+                                                  BoxConstraints(), // Kısıtlamaları kaldırdık
+                                            ),
+                                          ],
+                                        ),
+                                        // Ürün Fiyatı
+                                        Text(
+                                          "${product.price * quantity} \$",
+                                          style: GoogleFonts.poppins(
+                                            color: ColorPalette.black,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        // Miktar Kontrol Butonları
+                                        Align(
+                                          // Butonları sağa yaslamak için Align kullandık
+                                          alignment: Alignment.bottomRight,
+                                          child: Container(
+                                            width:
+                                                width *
+                                                0.3, // Genişliği artırdık, ihtiyaca göre ayarla
+                                            height:
+                                                height *
+                                                0.035, // Yüksekliği biraz artırdık
+                                            decoration: BoxDecoration(
+                                              color: ColorPalette.black,
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                GestureDetector(
+                                                  onTap:
+                                                      () =>
+                                                          _updateCartItemQuantity(
+                                                            product.id,
+                                                            quantity - 1,
+                                                          ),
+                                                  child: Icon(
+                                                    Icons.remove,
+                                                    color: ColorPalette.white,
+                                                    size:
+                                                        20, // İkon boyutunu biraz büyüttük
+                                                  ),
+                                                ),
+                                                Text(
+                                                  quantity.toString(),
+                                                  style: GoogleFonts.poppins(
+                                                    color: ColorPalette.white,
+                                                    fontSize:
+                                                        20, // Metin boyutunu biraz düşürdük
+                                                    fontWeight:
+                                                        FontWeight
+                                                            .bold, // Kalın yapabiliriz
+                                                  ),
+                                                ),
+                                                GestureDetector(
+                                                  onTap:
+                                                      () =>
+                                                          _updateCartItemQuantity(
+                                                            product.id,
+                                                            quantity + 1,
+                                                          ),
+                                                  child: Icon(
+                                                    Icons.add,
+                                                    color: ColorPalette.white,
+                                                    size:
+                                                        20, // İkon boyutunu biraz büyüttük
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          /*CartItem(
                               width: width,
                               height: height,
                               title: product.name,
@@ -382,7 +538,7 @@ class _CartPageState extends State<CartPage> {
                                     quantity - 1,
                                   ),
                             ),
-                          ),
+                          ),*/
                           Container(
                             color: ColorPalette.black,
                             height: 0.3,
@@ -408,7 +564,7 @@ class _CartPageState extends State<CartPage> {
                       ),
                       Text(
                         "I want to use promotion code",
-                        style: GoogleFonts.playfair(
+                        style: GoogleFonts.poppins(
                           color: ColorPalette.black,
                           fontSize: 16,
                         ),
@@ -427,13 +583,13 @@ class _CartPageState extends State<CartPage> {
                   child: TextField(
                     controller: _promotionCodeController,
                     cursorColor: Colors.black,
-                    style: GoogleFonts.playfair(
+                    style: GoogleFonts.poppins(
                       color: ColorPalette.black,
                       fontSize: 16,
                     ),
                     decoration: InputDecoration(
                       labelText: "Enter your code",
-                      labelStyle: GoogleFonts.playfair(
+                      labelStyle: GoogleFonts.poppins(
                         color: ColorPalette.black,
                         fontSize: 16,
                       ),
@@ -460,7 +616,7 @@ class _CartPageState extends State<CartPage> {
                       ),
                       Text(
                         "I want to add gift card",
-                        style: GoogleFonts.playfair(
+                        style: GoogleFonts.poppins(
                           color: ColorPalette.black,
                           fontSize: 16,
                         ),
@@ -479,13 +635,13 @@ class _CartPageState extends State<CartPage> {
                   child: TextField(
                     controller: _giftCardMessageController,
                     cursorColor: Colors.black,
-                    style: GoogleFonts.playfair(
+                    style: GoogleFonts.poppins(
                       color: ColorPalette.black,
                       fontSize: 16,
                     ),
                     decoration: InputDecoration(
                       labelText: "Enter your words for gift card",
-                      labelStyle: GoogleFonts.playfair(
+                      labelStyle: GoogleFonts.poppins(
                         color: ColorPalette.black,
                         fontSize: 16,
                       ),
@@ -507,14 +663,14 @@ class _CartPageState extends State<CartPage> {
                       children: [
                         Text(
                           "Total Price",
-                          style: GoogleFonts.playfair(
+                          style: GoogleFonts.poppins(
                             color: ColorPalette.black,
                             fontSize: 16,
                           ),
                         ),
                         Text(
                           "${_calculateTotalPrice().toStringAsFixed(2)} \$",
-                          style: GoogleFonts.playfair(
+                          style: GoogleFonts.poppins(
                             color: ColorPalette.black,
                             fontSize: 16,
                           ),
@@ -547,7 +703,7 @@ class _CartPageState extends State<CartPage> {
                       ),
                       child: Text(
                         "Pay Now",
-                        style: GoogleFonts.playfair(
+                        style: GoogleFonts.poppins(
                           color: ColorPalette.white,
                           fontSize: 16,
                         ),
@@ -633,7 +789,7 @@ class CartItem extends StatelessWidget {
                         title,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2, // İki satıra kadar sığdır
-                        style: GoogleFonts.playfair(
+                        style: GoogleFonts.poppins(
                           color: ColorPalette.black,
                           fontSize: 16,
                         ),
@@ -654,7 +810,7 @@ class CartItem extends StatelessWidget {
                 // Ürün Fiyatı
                 Text(
                   "$price \$",
-                  style: GoogleFonts.playfair(
+                  style: GoogleFonts.poppins(
                     color: ColorPalette.black,
                     fontSize: 16,
                   ),
@@ -684,7 +840,7 @@ class CartItem extends StatelessWidget {
                         ),
                         Text(
                           quantity.toString(),
-                          style: GoogleFonts.playfair(
+                          style: GoogleFonts.poppins(
                             color: ColorPalette.white,
                             fontSize: 20, // Metin boyutunu biraz düşürdük
                             fontWeight: FontWeight.bold, // Kalın yapabiliriz

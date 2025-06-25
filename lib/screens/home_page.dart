@@ -11,10 +11,11 @@ import 'package:scuba_diving/models/cart.dart' show Cart;
 import 'package:scuba_diving/models/favorite.dart';
 import 'package:scuba_diving/models/product.dart';
 import 'package:scuba_diving/screens/most_favorited_products_page.dart';
+import 'package:scuba_diving/screens/picture/picture.dart';
 import 'package:scuba_diving/screens/product_page.dart';
 import 'package:scuba_diving/screens/product_search_page.dart';
 import 'package:scuba_diving/screens/take_info.dart';
-import 'package:scuba_diving/screens/top_viewed_products_page.dart';
+import 'package:scuba_diving/screens/most_viewed_products_page.dart';
 import 'package:scuba_diving/screens/which_category.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Yeni import
 
@@ -490,6 +491,7 @@ class _HomePageState extends State<HomePage> {
     final height = MediaQuery.of(context).size.height;
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.symmetric(
@@ -499,22 +501,12 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               children: [
                 //top
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const CircleAvatar(
-                      backgroundColor: Colors.black,
-                      radius: 20,
-                    ),
-                    Text(
-                      "Scuba Living",
-                      style: GoogleFonts.playfair(
-                        color: ColorPalette.black,
-                        fontSize: 30,
-                      ),
-                    ),
-                    const Icon(Icons.notifications_none, color: Colors.black),
-                  ],
+                Text(
+                  "Scuba Living",
+                  style: GoogleFonts.poppins(
+                    color: ColorPalette.black,
+                    fontSize: 30,
+                  ),
                 ),
                 SizedBox(height: height * 0.02),
                 // Arama kutusu için GestureDetector ekliyoruz
@@ -565,9 +557,9 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Text(
                       "Favorite Products",
-                      style: GoogleFonts.playfair(
+                      style: GoogleFonts.poppins(
                         color: ColorPalette.black,
-                        fontSize: 16,
+                        fontSize: 14,
                       ),
                     ),
                     TextButton(
@@ -582,9 +574,9 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: Text(
                         'See All',
-                        style: GoogleFonts.playfair(
+                        style: GoogleFonts.poppins(
                           color: ColorPalette.black,
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -632,7 +624,7 @@ class _HomePageState extends State<HomePage> {
                                       color: ColorPalette.black,
                                       width: 0.2,
                                     ),
-                                    color: ColorPalette.cardColor,
+                                    color: ColorPalette.white,
                                   ),
                                   child: Column(
                                     crossAxisAlignment:
@@ -644,32 +636,24 @@ class _HomePageState extends State<HomePage> {
                                           ClipRRect(
                                             borderRadius:
                                                 const BorderRadius.only(
-                                                  topLeft: Radius.circular(6),
-                                                  topRight: Radius.circular(6),
+                                                  topLeft: Radius.circular(7),
+                                                  topRight: Radius.circular(7),
                                                 ),
                                             child: Container(
                                               width: width * 0.35,
                                               height: height * 0.15,
-                                              color: Colors.green,
+                                              color: Colors.transparent,
                                               alignment: Alignment.center,
-                                              child: Text(
-                                                product.mainPictureUrl,
+                                              child: Picture(
+                                                baseUrl:
+                                                    "https://scuba-diving-s3-bucket.s3.eu-north-1.amazonaws.com/products",
+                                                fileName: "${product.name}-1",
                                               ),
                                             ),
-
-                                            /*Image.asset(
-                                              sampleImages[index %
-                                                  sampleImages.length],
-                                              width: width * 0.35,
-                                              height: height * 0.15,
-                                              fit: BoxFit.cover,
-                                            ),*/
                                           ),
-                                          // .... Home_page.dart içerisinde 'Favorites Products' bölümünde
-                                          // Genellikle Product sınıfından bir 'product' nesnesidir.
+
                                           IconButton(
                                             icon: Icon(
-                                              // product.id'yi kullanarak kontrol ediyoruz
                                               _favoriteProductIds.contains(
                                                     product.id,
                                                   )
@@ -680,7 +664,7 @@ class _HomePageState extends State<HomePage> {
                                                         product.id,
                                                       )
                                                       ? Colors.red
-                                                      : Colors.white,
+                                                      : Colors.grey,
                                             ),
                                             onPressed: () {
                                               _addOrRemoveFavorite(product.id);
@@ -698,7 +682,7 @@ class _HomePageState extends State<HomePage> {
                                             children: [
                                               Text(
                                                 "${product.price.toStringAsFixed(2)} \$",
-                                                style: GoogleFonts.playfair(
+                                                style: GoogleFonts.poppins(
                                                   color: ColorPalette.black,
                                                   fontSize: 12,
                                                 ),
@@ -709,7 +693,7 @@ class _HomePageState extends State<HomePage> {
                                                 width: width * 0.26,
                                                 child: Text(
                                                   product.name,
-                                                  style: GoogleFonts.playfair(
+                                                  style: GoogleFonts.poppins(
                                                     color: ColorPalette.black,
                                                     fontSize: 12,
                                                   ),
@@ -806,9 +790,9 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Text(
                       "Most Viewed Products",
-                      style: GoogleFonts.playfair(
+                      style: GoogleFonts.poppins(
                         color: ColorPalette.black,
-                        fontSize: 16,
+                        fontSize: 14,
                       ),
                     ),
                     TextButton(
@@ -822,9 +806,9 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: Text(
                         'See All',
-                        style: GoogleFonts.playfair(
+                        style: GoogleFonts.poppins(
                           color: ColorPalette.black,
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -872,7 +856,7 @@ class _HomePageState extends State<HomePage> {
                                       color: ColorPalette.black,
                                       width: 0.2,
                                     ),
-                                    color: ColorPalette.cardColor,
+                                    color: ColorPalette.white,
                                   ),
                                   child: Column(
                                     crossAxisAlignment:
@@ -884,32 +868,23 @@ class _HomePageState extends State<HomePage> {
                                           ClipRRect(
                                             borderRadius:
                                                 const BorderRadius.only(
-                                                  topLeft: Radius.circular(6),
-                                                  topRight: Radius.circular(6),
+                                                  topLeft: Radius.circular(7),
+                                                  topRight: Radius.circular(7),
                                                 ),
                                             child: Container(
                                               width: width * 0.35,
                                               height: height * 0.15,
-                                              color: Colors.green,
+                                              color: Colors.transparent,
                                               alignment: Alignment.center,
-                                              child: Text(
-                                                product2.mainPictureUrl,
+                                              child: Picture(
+                                                baseUrl:
+                                                    "https://scuba-diving-s3-bucket.s3.eu-north-1.amazonaws.com/products",
+                                                fileName: "${product2.name}-1",
                                               ),
                                             ),
-
-                                            /*Image.asset(
-                                              sampleImages[index %
-                                                  sampleImages.length],
-                                              width: width * 0.35,
-                                              height: height * 0.15,
-                                              fit: BoxFit.cover,
-                                            ),*/
                                           ),
-                                          // .... Home_page.dart içerisinde 'Favorites Products' bölümünde
-                                          // Genellikle Product sınıfından bir 'product' nesnesidir.
                                           IconButton(
                                             icon: Icon(
-                                              // product.id'yi kullanarak kontrol ediyoruz
                                               _favoriteProductIds.contains(
                                                     product2.id,
                                                   )
@@ -920,7 +895,7 @@ class _HomePageState extends State<HomePage> {
                                                         product2.id,
                                                       )
                                                       ? Colors.red
-                                                      : Colors.white,
+                                                      : Colors.grey,
                                             ),
                                             onPressed: () {
                                               _addOrRemoveFavorite(product2.id);
@@ -938,7 +913,7 @@ class _HomePageState extends State<HomePage> {
                                             children: [
                                               Text(
                                                 "${product2.price.toStringAsFixed(2)} \$",
-                                                style: GoogleFonts.playfair(
+                                                style: GoogleFonts.poppins(
                                                   color: ColorPalette.black,
                                                   fontSize: 12,
                                                 ),
@@ -949,7 +924,7 @@ class _HomePageState extends State<HomePage> {
                                                 width: width * 0.26,
                                                 child: Text(
                                                   product2.name,
-                                                  style: GoogleFonts.playfair(
+                                                  style: GoogleFonts.poppins(
                                                     color: ColorPalette.black,
                                                     fontSize: 12,
                                                   ),
@@ -1060,9 +1035,9 @@ class SmallPicture extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: GoogleFonts.playfair(
+          style: GoogleFonts.poppins(
             color: Colors.white,
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -1104,9 +1079,9 @@ class BigPicture extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: GoogleFonts.playfair(
+          style: GoogleFonts.poppins(
             color: Colors.white,
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
         ),

@@ -99,16 +99,20 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       appBar: AppBar(
         title: Text(
           "Forgot Password",
-          style: GoogleFonts.playfair(
-            color: ColorPalette.white,
-            fontSize: 24,
+          style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
+            color: ColorPalette.white,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.black,
+        backgroundColor: ColorPalette.black,
         elevation: 0,
-        iconTheme: IconThemeData(color: ColorPalette.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: ColorPalette.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(width * 0.05),
@@ -117,7 +121,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             Text(
               "Enter your email address to reset your password.",
               textAlign: TextAlign.center,
-              style: GoogleFonts.playfair(
+              style: GoogleFonts.poppins(
                 color: ColorPalette.black,
                 fontSize: 16,
               ),
@@ -155,7 +159,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   ),
                   child: Text(
                     "Send Code To My Mail",
-                    style: GoogleFonts.playfair(
+                    style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),

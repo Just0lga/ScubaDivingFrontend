@@ -14,7 +14,7 @@ class TakeInfo extends StatelessWidget {
         iconTheme: const IconThemeData(color: ColorPalette.white),
         title: Text(
           'Scuba Diving Info',
-          style: GoogleFonts.playfair(
+          style: GoogleFonts.poppins(
             fontSize: 22,
             fontWeight: FontWeight.bold,
             color: ColorPalette.white,
@@ -85,7 +85,7 @@ class TakeInfo extends StatelessWidget {
           children: [
             Text(
               title,
-              style: GoogleFonts.playfair(
+              style: GoogleFonts.poppins(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: ColorPalette.primary,
@@ -95,7 +95,7 @@ class TakeInfo extends StatelessWidget {
             if (content != null)
               Text(
                 content,
-                style: GoogleFonts.playfair(
+                style: GoogleFonts.poppins(
                   fontSize: 16,
                   color: ColorPalette.black,
                 ),
@@ -122,7 +122,7 @@ class TakeInfo extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.playfair(
+              style: GoogleFonts.poppins(
                 fontSize: 16,
                 color: ColorPalette.black,
               ),

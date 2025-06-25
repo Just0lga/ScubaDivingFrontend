@@ -8,6 +8,7 @@ import 'package:scuba_diving/main.dart';
 import 'package:scuba_diving/models/cart.dart';
 import 'package:scuba_diving/models/favorite.dart';
 import 'package:scuba_diving/models/product.dart';
+import 'package:scuba_diving/screens/picture/picture.dart';
 import 'package:scuba_diving/screens/product_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -441,7 +442,7 @@ class _MostFavoritedProductsPageState extends State<MostFavoritedProductsPage> {
         centerTitle: true,
         title: Text(
           "Favorite Products",
-          style: GoogleFonts.playfair(
+          style: GoogleFonts.poppins(
             color: ColorPalette.white,
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -507,7 +508,7 @@ class _MostFavoritedProductsPageState extends State<MostFavoritedProductsPage> {
                           color: ColorPalette.black,
                           width: 0.2,
                         ),
-                        color: ColorPalette.cardColor,
+                        color: ColorPalette.white,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -517,15 +518,19 @@ class _MostFavoritedProductsPageState extends State<MostFavoritedProductsPage> {
                             children: [
                               Container(
                                 height: height * 0.15,
-                                decoration: BoxDecoration(
-                                  color: Colors.green,
+                                decoration: const BoxDecoration(
+                                  color: Colors.transparent,
                                   borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(6),
                                     topRight: Radius.circular(6),
                                   ),
                                 ),
                                 alignment: Alignment.center,
-                                child: Text(product.mainPictureUrl),
+                                child: Picture(
+                                  baseUrl:
+                                      "https://scuba-diving-s3-bucket.s3.eu-north-1.amazonaws.com/products",
+                                  fileName: "${product.name}-1",
+                                ),
                               ),
                               IconButton(
                                 icon: Icon(
@@ -552,7 +557,7 @@ class _MostFavoritedProductsPageState extends State<MostFavoritedProductsPage> {
                               children: [
                                 Text(
                                   "${product.price.toStringAsFixed(2)} \$",
-                                  style: GoogleFonts.playfair(
+                                  style: GoogleFonts.poppins(
                                     color: ColorPalette.black,
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
@@ -563,7 +568,7 @@ class _MostFavoritedProductsPageState extends State<MostFavoritedProductsPage> {
                                 SizedBox(height: height * 0.005),
                                 Text(
                                   product.name,
-                                  style: GoogleFonts.playfair(
+                                  style: GoogleFonts.poppins(
                                     color: ColorPalette.black,
                                     fontSize: 13,
                                   ),

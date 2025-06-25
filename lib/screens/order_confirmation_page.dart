@@ -23,7 +23,7 @@ class OrderConfirmationPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           isSuccess ? "Order Confirmation" : "Order Error", // Translated
-          style: GoogleFonts.playfair(
+          style: GoogleFonts.poppins(
             color: ColorPalette.white,
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -52,7 +52,7 @@ class OrderConfirmationPage extends StatelessWidget {
                     ? "Your order has been placed successfully!" // Translated
                     : "An error occurred while placing your order!", // Translated
                 textAlign: TextAlign.center,
-                style: GoogleFonts.playfair(
+                style: GoogleFonts.poppins(
                   color: isSuccess ? ColorPalette.black : Colors.red,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -61,7 +61,7 @@ class OrderConfirmationPage extends StatelessWidget {
               if (isSuccess)
                 Text(
                   "Order ID: #${orderId ?? 'N/A'}", // Translated
-                  style: GoogleFonts.playfair(
+                  style: GoogleFonts.poppins(
                     color: ColorPalette.black70,
                     fontSize: 16,
                   ),
@@ -70,7 +70,7 @@ class OrderConfirmationPage extends StatelessWidget {
               if (!isSuccess && errorMessage != null)
                 Text(
                   "Error Detail: ${errorMessage!}", // Translated
-                  style: GoogleFonts.playfair(
+                  style: GoogleFonts.poppins(
                     color: Colors.red.shade700,
                     fontSize: 14,
                   ),
@@ -101,7 +101,7 @@ class OrderConfirmationPage extends StatelessWidget {
                 ),
                 child: Text(
                   "Return to Main Page", // Translated
-                  style: GoogleFonts.playfair(
+                  style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
