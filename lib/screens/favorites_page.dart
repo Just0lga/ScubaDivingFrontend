@@ -125,7 +125,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
       setState(() {
         _isLoading = false;
       });
-      _showSnackBar('An error occurred: $e', Colors.red);
+      _showSnackBar('Check WI-FI', Colors.red);
     }
   }
 
@@ -186,7 +186,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
         });
       }
       await _fetchFavoriteProducts(_currentUserId!);
-      _showSnackBar('A network error occurred: $e', Colors.red);
+      _showSnackBar('A network error occurred', Colors.red);
     }
   }
 
@@ -216,17 +216,17 @@ class _FavoritesPageState extends State<FavoritesPage> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         _showSnackBar('"${product.name}" added to cart!', Colors.green);
       } else {
-        String errorMessage = 'Failed to add to cart: ${response.statusCode}';
+        String errorMessage = "The product is already in cart";
+        print("Failed to add to cart: ${response.statusCode}");
         dynamic errorBody;
         try {
           errorBody = jsonDecode(response.body);
-          errorMessage =
-              errorBody['message'] ?? errorBody['detail'] ?? errorMessage;
+          print(response.body);
         } catch (e) {}
-        _showSnackBar(errorMessage, Colors.red);
+        _showSnackBar(errorMessage, Colors.green);
       }
     } catch (e) {
-      _showSnackBar('A network error occurred: $e', Colors.red);
+      _showSnackBar('A network error occurred', Colors.red);
     }
   }
 

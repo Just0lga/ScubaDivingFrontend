@@ -116,7 +116,7 @@ class _PaymentPageState extends State<PaymentPage> {
         );
       }
     } catch (e) {
-      _showSnackBar('A network error occurred: $e', Colors.red);
+      _showSnackBar('A network error occurred', Colors.red);
       print('Error fetching addresses: $e');
     } finally {
       setState(() {

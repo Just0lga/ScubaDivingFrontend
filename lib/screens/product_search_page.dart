@@ -194,7 +194,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
           _cartProductIds.remove(productId);
         }
       });
-      _showSnackBar('A network error occurred: $e', Colors.red);
+      _showSnackBar('A network error occurred', Colors.red);
       print('Error sending cart request: $e');
     }
   }
@@ -347,7 +347,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
           _favoriteProductIds.remove(productId);
         }
       });
-      _showSnackBar('A network error occurred: $e', Colors.red);
+      _showSnackBar('A network error occurred', Colors.red);
       print('Error sending favorite request: $e');
     }
   }
@@ -391,7 +391,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
         );
       }
     } catch (e) {
-      _showSnackBar('An error occurred: $e', Colors.red);
+      _showSnackBar('An error occurred', Colors.red);
       print('Error fetching search results: $e');
     } finally {
       setState(() {

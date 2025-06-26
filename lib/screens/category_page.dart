@@ -187,7 +187,7 @@ class _CategoryPageState extends State<CategoryPage> {
           _cartProductIds.remove(productId);
         }
       });
-      _showSnackBar('A network error occurred: $e', Colors.red);
+      _showSnackBar('A network error occurred', Colors.red);
     }
   }
 
@@ -322,7 +322,7 @@ class _CategoryPageState extends State<CategoryPage> {
           _favoriteProductIds.remove(productId);
         }
       });
-      _showSnackBar('A network error occurred: $e', Colors.red);
+      _showSnackBar('A network error occurred', Colors.red);
     }
   }
 
@@ -356,7 +356,7 @@ class _CategoryPageState extends State<CategoryPage> {
         _showSnackBar("No products found in this category", Colors.green);
       }
     } catch (e) {
-      _showSnackBar('An error occurred: $e', Colors.red);
+      _showSnackBar('An error occurred', Colors.red);
     } finally {
       setState(() {
         _isLoading = false;

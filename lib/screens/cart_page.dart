@@ -124,7 +124,7 @@ class _CartPageState extends State<CartPage> {
         _showSnackBar('Your cart is empty', Colors.green);
       }
     } catch (e) {
-      _showSnackBar('A network error occurred: $e', Colors.red);
+      _showSnackBar('Check WI-FI', Colors.red);
     } finally {
       setState(() {
         _isLoadingCartItems = false;
@@ -188,7 +188,7 @@ class _CartPageState extends State<CartPage> {
         });
       }
     } catch (e) {
-      _showSnackBar('A network error occurred: $e', Colors.red);
+      _showSnackBar('A network error occurred', Colors.red);
       setState(() {
         _cartProducts.add(productToRemove);
         _cartProductQuantities[productId] = originalQuantity;
@@ -250,7 +250,7 @@ class _CartPageState extends State<CartPage> {
         });
       }
     } catch (e) {
-      _showSnackBar('A network error occurred: $e', Colors.red);
+      _showSnackBar('A network error occurred', Colors.red);
       setState(() {
         if (oldQuantity != null) {
           _cartProductQuantities[productId] = oldQuantity;

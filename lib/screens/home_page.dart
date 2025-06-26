@@ -332,7 +332,7 @@ class _HomePageState extends State<HomePage> {
           _cartProductIds.remove(productId);
         }
       });
-      _showSnackBar('A network error occurred: $e', Colors.red);
+      _showSnackBar('A network error occurred', Colors.red);
       print('Error sending cart request: $e');
     }
   }
@@ -434,7 +434,7 @@ class _HomePageState extends State<HomePage> {
           _favoriteProductIds.remove(productId);
         }
       });
-      _showSnackBar('A network error occurred: $e', Colors.red);
+      _showSnackBar('A network error occurred', Colors.red);
       print('Error sending favorite request: $e');
     }
   }

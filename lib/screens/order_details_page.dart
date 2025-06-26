@@ -54,10 +54,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         _errorMessage = 'Error loading authentication data: $e';
         _isLoading = false;
       });
-      _showSnackBar(
-        'Error loading authentication data: $e',
-        ColorPalette.error,
-      );
+      _showSnackBar('Error loading authentication data', ColorPalette.error);
     }
   }
 
@@ -108,7 +105,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       setState(() {
         _errorMessage = 'Network error or invalid response: $e';
       });
-      _showSnackBar('Network error: $e', ColorPalette.error);
+      _showSnackBar('Network error', ColorPalette.error);
     } finally {
       setState(() {
         _isLoading = false;

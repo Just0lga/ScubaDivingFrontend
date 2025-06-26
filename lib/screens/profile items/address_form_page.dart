@@ -141,7 +141,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error saving address: $e'),
+          content: Text('Error saving address'),
           backgroundColor: ColorPalette.error,
         ),
       );
@@ -411,7 +411,7 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error fetching addresses: $e';
+        _errorMessage = 'Error fetching addresses';
       });
     } finally {
       setState(() {
@@ -485,7 +485,7 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Error deleting address: $e')));
+      ).showSnackBar(SnackBar(content: Text('Error deleting address')));
     } finally {
       setState(() {
         _isLoading = false;

@@ -72,7 +72,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         print('API Error: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      _showSnackBar('A network error occurred: $e', Colors.red);
+      _showSnackBar('A network error occurred', Colors.red);
       print('Error sending password reset request: $e');
     } finally {
       setState(() {
