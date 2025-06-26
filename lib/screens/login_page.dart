@@ -85,10 +85,9 @@ class _LoginpageState extends State<Loginpage> {
         }
 
         if (_errorMessage == null) {
-          Navigator.pushAndRemoveUntil(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => MainPage()),
-            (Route<dynamic> route) => false,
           );
         }
       } else {
