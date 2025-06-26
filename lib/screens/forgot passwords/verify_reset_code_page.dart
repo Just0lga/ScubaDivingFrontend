@@ -127,10 +127,7 @@ class _VerifyResetCodePageState extends State<VerifyResetCodePage> {
       appBar: AppBar(
         title: Text(
           "Reset Password",
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-            color: ColorPalette.white,
-          ),
+          style: GoogleFonts.poppins(color: ColorPalette.white),
         ),
         centerTitle: true,
         backgroundColor: ColorPalette.black,
