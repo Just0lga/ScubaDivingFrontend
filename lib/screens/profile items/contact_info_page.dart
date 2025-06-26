@@ -5,7 +5,6 @@ import 'package:scuba_diving/colors/color_palette.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ContactInfoPage extends StatelessWidget {
-  // Your contact information
   final String name = 'Tolga Küçükaşçı';
   final String email = 'tkucukasci@gmail.com';
   final String phoneNumber = '+905396453204';
@@ -49,7 +48,6 @@ class ContactInfoPage extends StatelessWidget {
           children: [
             const SizedBox(height: 24),
 
-            // Name
             Text(
               name,
               style: GoogleFonts.poppins(
@@ -61,7 +59,7 @@ class ContactInfoPage extends StatelessWidget {
             const SizedBox(height: 8),
 
             Text(
-              'Flutter Developer | Scuba Diver', // Your title/tagline
+              'Flutter Developer | Scuba Diver',
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 color: ColorPalette.black70,
@@ -69,7 +67,6 @@ class ContactInfoPage extends StatelessWidget {
             ),
             const SizedBox(height: 32),
 
-            // Contact Information Cards
             _buildContactCard(
               context,
               icon: Icons.email,
@@ -89,7 +86,6 @@ class ContactInfoPage extends StatelessWidget {
             ),
             const SizedBox(height: 32),
 
-            // Social Media Links
             Text(
               'Find me on social media:',
               style: GoogleFonts.poppins(
@@ -106,16 +102,15 @@ class ContactInfoPage extends StatelessWidget {
                   context,
                   icon: FontAwesomeIcons.linkedin,
                   url: linkedinUrl,
-                  color: const Color(0xFF0A66C2), // LinkedIn blue
+                  color: const Color(0xFF0A66C2),
                 ),
                 const SizedBox(width: 24),
                 _buildSocialMediaIcon(
                   context,
                   icon: FontAwesomeIcons.github,
                   url: githubUrl,
-                  color: const Color(0xFF333333), // GitHub black
+                  color: const Color(0xFF333333),
                 ),
-                // Add more social media icons as needed
               ],
             ),
             const SizedBox(height: 24),
@@ -141,7 +136,7 @@ class ContactInfoPage extends StatelessWidget {
   }) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-      color: ColorPalette.cardColor,
+      color: ColorPalette.white,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(6),
@@ -191,7 +186,7 @@ class ContactInfoPage extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: ColorPalette.cardColor, // Lighter background for the icon
+          color: ColorPalette.cardColor,
           shape: BoxShape.circle,
         ),
         child: FaIcon(icon, color: color, size: 30),

@@ -1,4 +1,4 @@
-import 'dart:async'; // TimeoutException için
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -26,7 +26,7 @@ class ProductCommentsPage extends StatefulWidget {
 
 class _ProductCommentsPageState extends State<ProductCommentsPage> {
   List<Review> _reviews = [];
-  bool _isLoading = true; // For reviews and general data
+  bool _isLoading = true;
   String _errorMessage = '';
 
   double _averageRating = 0.0;
@@ -35,16 +35,15 @@ class _ProductCommentsPageState extends State<ProductCommentsPage> {
   final TextEditingController _commentController = TextEditingController();
   double _userRating = 0.0;
 
-  String? _currentUserId; // User ID from SharedPreferences
-  Map<String, String> _userNames = {}; // To store userId -> userName mapping
-  Set<String> _fetchingUserIds =
-      {}; // To track user IDs currently being fetched
+  String? _currentUserId;
+  Map<String, String> _userNames = {};
+  Set<String> _fetchingUserIds = {};
 
   @override
   void initState() {
     super.initState();
-    _loadUserId(); // Load current user ID first
-    _fetchProductReviews(); // Then fetch reviews
+    _loadUserId();
+    _fetchProductReviews();
   }
 
   @override
@@ -84,7 +83,6 @@ class _ProductCommentsPageState extends State<ProductCommentsPage> {
             _calculateReviewStats();
             _isLoading = false;
           });
-          // After reviews are fetched, fetch usernames for them
           _fetchUsernamesForReviews();
         }
       } else {
@@ -117,7 +115,6 @@ class _ProductCommentsPageState extends State<ProductCommentsPage> {
     }
   }
 
-  // New function to fetch usernames for existing reviews
   Future<void> _fetchUsernamesForReviews() async {
     if (!mounted) return;
 
@@ -131,10 +128,9 @@ class _ProductCommentsPageState extends State<ProductCommentsPage> {
     }
 
     if (uniqueUserIds.isEmpty) {
-      return; // No new user IDs to fetch
+      return;
     }
 
-    // Add new user IDs to the fetching set
     setState(() {
       _fetchingUserIds.addAll(uniqueUserIds);
     });
@@ -146,7 +142,6 @@ class _ProductCommentsPageState extends State<ProductCommentsPage> {
 
     await Future.wait(fetchTasks);
 
-    // Clear fetching state
     if (mounted) {
       setState(() {
         _fetchingUserIds.removeAll(uniqueUserIds);
@@ -154,7 +149,6 @@ class _ProductCommentsPageState extends State<ProductCommentsPage> {
     }
   }
 
-  // Helper function to fetch a single username
   Future<void> _fetchUsername(String userId) async {
     try {
       final uri = Uri.parse('$API_BASE_URL/api/Auth/username/$userId');
@@ -171,7 +165,6 @@ class _ProductCommentsPageState extends State<ProductCommentsPage> {
         print(
           'Failed to load username for $userId: Status code ${response.statusCode}. Body: ${response.body}',
         );
-        // Store an error placeholder or just leave it null/default
         if (mounted) {
           setState(() {
             _userNames[userId] = 'Error: ${response.statusCode}';
@@ -213,14 +206,16 @@ class _ProductCommentsPageState extends State<ProductCommentsPage> {
   Future<void> _submitReview() async {
     if (_currentUserId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Yorum yapmak için giriş yapmalısınız.')),
+        const SnackBar(
+          content: Text('You must be logged in to leave a review.'),
+        ),
       );
       return;
     }
 
     if (_userRating == 0.0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Lütfen bir yıldız derecesi seçin.')),
+        const SnackBar(content: Text('Please select a star rating.')),
       );
       return;
     }
@@ -229,11 +224,11 @@ class _ProductCommentsPageState extends State<ProductCommentsPage> {
     final String? authToken = prefs.getString('authToken');
 
     if (authToken == null) {
-      print('Auth Token bulunamadı. Yorum gönderilemedi.');
+      print('Auth Token not found. Review could not be sent.');
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Yetkilendirme hatası.')));
+        ).showSnackBar(const SnackBar(content: Text('Authentication error.')));
       }
       return;
     }
@@ -244,9 +239,7 @@ class _ProductCommentsPageState extends State<ProductCommentsPage> {
       'productId': widget.productId,
       'rating': _userRating.toInt(),
       'comment': _commentController.text,
-      'createdAt':
-          DateTime.now()
-              .toIso8601String(), // Backend'de DateTime.UtcNow() kullanılmalı
+      'createdAt': DateTime.now().toIso8601String(),
     };
 
     try {
@@ -264,45 +257,44 @@ class _ProductCommentsPageState extends State<ProductCommentsPage> {
       if (response.statusCode == 201 || response.statusCode == 200) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Yorumunuz başarıyla gönderildi!')),
+            const SnackBar(
+              content: Text('Your review has been sent successfully!'),
+            ),
           );
           _commentController.clear();
           setState(() {
-            _userRating = 0.0; // Puanı sıfırla
+            _userRating = 0.0;
           });
-          _fetchProductReviews(); // Yorumları yenile
-          Navigator.pop(
-            context,
-            true,
-          ); // Ürün sayfasına geri dönerken "true" gönder
+          _fetchProductReviews();
+          Navigator.pop(context, true);
         }
       } else {
         print(
-          'Yorum gönderme başarısız: ${response.statusCode} - ${response.body}',
+          'Review submission failed: ${response.statusCode} - ${response.body}',
         );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Yorum gönderme başarısız oldu.')),
+            const SnackBar(content: Text('Failed to submit review.')),
           );
         }
       }
     } on TimeoutException catch (e) {
-      print('Yorum gönderme sırasında zaman aşımı: $e');
+      print('Timeout during review submission: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'Yorum gönderme sırasında bir hata oluştu (Zaman Aşımı).',
+              'An error occurred during review submission (Timeout).',
             ),
           ),
         );
       }
     } catch (e) {
-      print('Yorum gönderme sırasında ağ hatası: $e');
+      print('Network error during review submission: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Yorum gönderme sırasında bir hata oluştu.'),
+            content: Text('An error occurred during review submission.'),
           ),
         );
       }
@@ -343,209 +335,205 @@ class _ProductCommentsPageState extends State<ProductCommentsPage> {
                 )
                 : _errorMessage.isNotEmpty
                 ? Center(child: Text(_errorMessage))
-                : Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Average Rating:',
-                            style: GoogleFonts.poppins(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                : SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Average Rating:',
+                          style: GoogleFonts.poppins(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
-                          SizedBox(height: 8),
-                          Row(
-                            children: [
-                              RatingBar.builder(
-                                itemSize: 24,
-                                initialRating: _averageRating,
-                                minRating: 0,
-                                direction: Axis.horizontal,
-                                allowHalfRating: true,
-                                itemCount: 5,
-                                itemPadding: const EdgeInsets.symmetric(
-                                  horizontal: 4.0,
-                                ),
-                                itemBuilder:
-                                    (context, _) => const Icon(
-                                      Icons.star,
-                                      color: Colors.amber,
-                                    ),
-                                onRatingUpdate: (rating) {},
-                                ignoreGestures: true,
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            RatingBar.builder(
+                              itemSize: 24,
+                              initialRating: _averageRating,
+                              minRating: 0,
+                              direction: Axis.horizontal,
+                              allowHalfRating: true,
+                              itemCount: 5,
+                              itemPadding: const EdgeInsets.symmetric(
+                                horizontal: 4.0,
                               ),
-                              SizedBox(width: 8),
-                              Text(
-                                '${_averageRating.toStringAsFixed(1)} out of 5 (${_reviewCount} reviews)',
-                                style: GoogleFonts.poppins(fontSize: 12),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 16),
-                          Text(
-                            'Write a Review:',
-                            style: GoogleFonts.poppins(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              itemBuilder:
+                                  (context, _) => const Icon(
+                                    Icons.star,
+                                    color: Colors.amber,
+                                  ),
+                              onRatingUpdate: (rating) {},
+                              ignoreGestures: true,
                             ),
-                          ),
-                          SizedBox(height: 8),
-                          RatingBar.builder(
-                            itemSize: 30,
-                            initialRating: _userRating,
-                            minRating: 1, // En az 1 yıldız seçilmeli
-                            direction: Axis.horizontal,
-                            allowHalfRating: false,
-                            itemCount: 5,
-                            itemPadding: const EdgeInsets.symmetric(
-                              horizontal: 4.0,
+                            const SizedBox(width: 8),
+                            Text(
+                              '${_averageRating.toStringAsFixed(1)} out of 5 (${_reviewCount} reviews)',
+                              style: GoogleFonts.poppins(fontSize: 12),
                             ),
-                            itemBuilder:
-                                (context, _) =>
-                                    const Icon(Icons.star, color: Colors.amber),
-                            onRatingUpdate: (rating) {
-                              setState(() {
-                                _userRating = rating;
-                              });
-                            },
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Write a Review:',
+                          style: GoogleFonts.poppins(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
-                          SizedBox(height: 16),
-                          TextField(
-                            controller: _commentController,
-                            maxLines: 3,
-                            decoration: InputDecoration(
-                              hintText: 'Your comments...',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              filled: true,
-                              fillColor: ColorPalette.cardColor,
+                        ),
+                        const SizedBox(height: 8),
+                        RatingBar.builder(
+                          itemSize: 30,
+                          initialRating: _userRating,
+                          minRating: 1,
+                          direction: Axis.horizontal,
+                          allowHalfRating: false,
+                          itemCount: 5,
+                          itemPadding: const EdgeInsets.symmetric(
+                            horizontal: 4.0,
+                          ),
+                          itemBuilder:
+                              (context, _) =>
+                                  const Icon(Icons.star, color: Colors.amber),
+                          onRatingUpdate: (rating) {
+                            setState(() {
+                              _userRating = rating;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: _commentController,
+                          maxLines: 3,
+                          decoration: InputDecoration(
+                            hintText: 'Your comments...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
                             ),
+                            filled: true,
+                            fillColor: ColorPalette.cardColor,
                           ),
-                          SizedBox(height: 16),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: _submitReview,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: ColorPalette.primary,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _submitReview,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: ColorPalette.primary,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Text(
-                                'Submit Review',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            ),
+                            child: Text(
+                              'Submit Review',
+                              style: GoogleFonts.poppins(
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    const Divider(),
-                    Expanded(
-                      child:
-                          _reviews.isEmpty
-                              ? Center(
+                        ),
+                        const Divider(),
+                        _reviews.isEmpty
+                            ? Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
                                 child: Text(
                                   'No reviews yet. Be the first to review!',
                                   style: GoogleFonts.poppins(fontSize: 16),
                                 ),
-                              )
-                              : ListView.builder(
-                                itemCount: _reviews.length,
-                                itemBuilder: (context, index) {
-                                  final review = _reviews[index];
-                                  // Get username from the map, fallback to "Anonymous" or "Loading..."
-                                  final String reviewerName =
-                                      review.userId != null
-                                          ? (_userNames[review.userId] ??
-                                              (_fetchingUserIds.contains(
-                                                    review.userId,
-                                                  )
-                                                  ? 'Loading...'
-                                                  : 'Anonymous'))
-                                          : 'Anonymous';
-                                  return Card(
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 8,
-                                    ),
-                                    elevation: 2,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            reviewerName, // Display fetched username
-                                            style: GoogleFonts.poppins(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                          RatingBar.builder(
-                                            itemSize: 18,
-                                            initialRating:
-                                                review.rating.toDouble(),
-                                            minRating: 0,
-                                            direction: Axis.horizontal,
-                                            allowHalfRating: true,
-                                            itemCount: 5,
-                                            itemPadding:
-                                                const EdgeInsets.symmetric(
-                                                  horizontal: 1.0,
-                                                ),
-                                            itemBuilder:
-                                                (context, _) => const Icon(
-                                                  Icons.star,
-                                                  color: Colors.amber,
-                                                ),
-                                            onRatingUpdate: (rating) {},
-                                            ignoreGestures: true,
-                                          ),
-                                          SizedBox(height: 8),
-                                          Text(
-                                            review.comment,
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                          SizedBox(height: 8),
-                                          Align(
-                                            alignment: Alignment.bottomRight,
-                                            child: Text(
-                                              // Yorum tarihini biçimlendirme
-                                              '${review.createdAt.toLocal().day}/${review.createdAt.toLocal().month}/${review.createdAt.toLocal().year}',
-                                              style: GoogleFonts.poppins(
-                                                fontSize: 12,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
                               ),
+                            )
+                            : ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: _reviews.length,
+                              itemBuilder: (context, index) {
+                                final review = _reviews[index];
+                                final String reviewerName =
+                                    review.userId != null
+                                        ? (_userNames[review.userId] ??
+                                            (_fetchingUserIds.contains(
+                                                  review.userId,
+                                                )
+                                                ? 'Loading...'
+                                                : 'Anonymous'))
+                                        : 'Anonymous';
+                                return Card(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  elevation: 2,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          reviewerName,
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        RatingBar.builder(
+                                          itemSize: 18,
+                                          initialRating:
+                                              review.rating.toDouble(),
+                                          minRating: 0,
+                                          direction: Axis.horizontal,
+                                          allowHalfRating: true,
+                                          itemCount: 5,
+                                          itemPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 1.0,
+                                              ),
+                                          itemBuilder:
+                                              (context, _) => const Icon(
+                                                Icons.star,
+                                                color: Colors.amber,
+                                              ),
+                                          onRatingUpdate: (rating) {},
+                                          ignoreGestures: true,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          review.comment,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Align(
+                                          alignment: Alignment.bottomRight,
+                                          child: Text(
+                                            '${review.createdAt.toLocal().day}/${review.createdAt.toLocal().month}/${review.createdAt.toLocal().year}',
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
       ),
     );

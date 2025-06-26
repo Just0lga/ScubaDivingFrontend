@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:scuba_diving/colors/color_palette.dart';
-import 'package:scuba_diving/main.dart'; // API_BASE_URL için
+import 'package:scuba_diving/main.dart';
 import 'package:scuba_diving/models/favorite.dart';
 import 'package:scuba_diving/models/product.dart';
 import 'package:scuba_diving/screens/picture/picture.dart';
@@ -45,13 +45,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
       setState(() {
         _isLoading = false;
       });
-      _showSnackBar(
-        'Favori ürünleri görüntülemek için giriş yapın.',
-        Colors.orange,
-      );
-      print(
-        'Kullanıcı ID\'si veya token\'ı bulunamadı, favoriler yüklenemedi.',
-      );
+      _showSnackBar('Please log in to view favorite products.', Colors.orange);
     }
   }
 
@@ -61,10 +55,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
         _isLoading = false;
       });
       _showSnackBar(
-        'Oturum token\'ı bulunamadı. Lütfen tekrar giriş yapın.',
+        'Session token not found. Please log in again.',
         Colors.orange,
       );
-      print('Auth Token bulunamadı. Favoriler çekilemedi.');
       return;
     }
 
@@ -105,17 +98,16 @@ class _FavoritesPageState extends State<FavoritesPage> {
               );
               fetchedProducts.add(Product.fromJson(productJson));
             } else {
-              print(
-                'Ürün detayı çekilemedi (ID: $productId): ${productResponse.statusCode} - ${productResponse.body}',
-              );
               _showSnackBar(
-                'Bazı favori ürün detayları çekilemedi.',
+                'Some favorite product details could not be fetched.',
                 Colors.orange,
               );
             }
           } catch (e) {
-            print('Ürün detayı çekerken hata oluştu (ID: $productId): $e');
-            _showSnackBar('Bazı favori ürün detayları çekilemedi.', Colors.red);
+            _showSnackBar(
+              'An error occurred while fetching some favorite product details.',
+              Colors.red,
+            );
           }
         }
 
@@ -123,41 +115,26 @@ class _FavoritesPageState extends State<FavoritesPage> {
           _favoriteProducts = fetchedProducts;
           _isLoading = false;
         });
-        print(
-          'Favori ürünler başarıyla çekildi ve detayları alındı: ${_favoriteProducts.length} adet.',
-        );
       } else {
         setState(() {
           _isLoading = false;
         });
-        _showSnackBar(
-          'Favori kayıtları çekilemedi: ${response.statusCode}',
-          Colors.red,
-        );
-        print(
-          'Failed to load favorite records: ${response.statusCode} - ${response.body}',
-        );
+        _showSnackBar('Your favorites are empty.', Colors.green);
       }
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      _showSnackBar('Bir hata oluştu: $e', Colors.red);
-      print('Error fetching favorite records: $e');
+      _showSnackBar('An error occurred: $e', Colors.red);
     }
   }
 
   Future<void> _removeFavorite(int productId) async {
     if (_currentUserId == null || _authToken == null) {
-      _showSnackBar(
-        'Favoriden kaldırmak için lütfen giriş yapın.',
-        Colors.orange,
-      );
+      _showSnackBar('Please log in to remove from favorites.', Colors.orange);
       return;
     }
 
-    // Optimistik güncelleme: UI'yı önce güncelle
-    // Kaldırılacak ürünü bir değişkene atayalım ki hata durumunda geri alabilelim.
     final Product? removedProduct = _favoriteProducts.firstWhere(
       (product) => product.id == productId,
     );
@@ -166,16 +143,14 @@ class _FavoritesPageState extends State<FavoritesPage> {
       setState(() {
         _favoriteProducts.removeWhere((product) => product.id == productId);
       });
-      _showSnackBar('Favori kaldırılıyor...', Colors.grey);
+      _showSnackBar('Removing from favorites...', Colors.grey);
     } else {
-      // Ürün zaten listede yoksa bir şey yapmayalım
       return;
     }
 
     try {
       final String deleteUrl =
           '$API_BASE_URL/api/Favorites/$_currentUserId/$productId';
-      print('Sending DELETE request to: $deleteUrl');
       final response = await http.delete(
         Uri.parse(deleteUrl),
         headers: <String, String>{
@@ -185,68 +160,43 @@ class _FavoritesPageState extends State<FavoritesPage> {
       );
 
       if (response.statusCode == 200 || response.statusCode == 204) {
-        _showSnackBar('Favori başarıyla kaldırıldı!', Colors.green);
-        print('Favorite removed successfully.');
+        _showSnackBar('Removed from favorites successfully!', Colors.green);
       } else {
-        // Hata oluştu, UI'yı eski durumuna geri al (rollback)
-        // ignore: unnecessary_null_comparison
         if (removedProduct != null) {
           setState(() {
             _favoriteProducts.add(removedProduct);
-            // Geri eklerken sıralamayı bozmamak için tekrar sıralayabiliriz veya baştan çekebiliriz.
-            // En sağlamı baştan çekmek.
           });
-          _favoriteProducts.sort(
-            (a, b) => a.id.compareTo(b.id),
-          ); // Basit bir sıralama
+          _favoriteProducts.sort((a, b) => a.id.compareTo(b.id));
         }
-        await _fetchFavoriteProducts(
-          _currentUserId!,
-        ); // Güncel listeyi tekrar çekerek durumu senkronize et
+        await _fetchFavoriteProducts(_currentUserId!);
         String errorMessage =
-            'Favoriden kaldırma başarısız: ${response.statusCode}';
+            'Failed to remove from favorites: ${response.statusCode}';
         try {
           final errorBody = jsonDecode(response.body);
           errorMessage =
               errorBody['message'] ?? errorBody['detail'] ?? errorMessage;
-        } catch (e) {
-          print('Error parsing error body: $e');
-        }
+        } catch (e) {}
         _showSnackBar(errorMessage, Colors.red);
-        print(
-          'Delete Favorite API Error: ${response.statusCode} - ${response.body}',
-        );
       }
     } catch (e) {
-      // Ağ hatası oluştu, UI'yı eski durumuna geri al (rollback)
-      // ignore: unnecessary_null_comparison
       if (removedProduct != null) {
         setState(() {
           _favoriteProducts.add(removedProduct);
-          _favoriteProducts.sort(
-            (a, b) => a.id.compareTo(b.id),
-          ); // Basit bir sıralama
+          _favoriteProducts.sort((a, b) => a.id.compareTo(b.id));
         });
       }
-      await _fetchFavoriteProducts(
-        _currentUserId!,
-      ); // Güncel listeyi tekrar çekerek durumu senkronize et
-      _showSnackBar('Bir ağ hatası oluştu: $e', Colors.red);
-      print('Error sending delete favorite request: $e');
+      await _fetchFavoriteProducts(_currentUserId!);
+      _showSnackBar('A network error occurred: $e', Colors.red);
     }
   }
 
-  // Yeni eklenecek metod: Sepete ürün ekleme
   Future<void> _addToCart(Product product) async {
     if (_currentUserId == null || _authToken == null) {
-      _showSnackBar(
-        'Ürünü sepete eklemek için lütfen giriş yapin.',
-        Colors.orange,
-      );
+      _showSnackBar('Please log in to add the product to cart.', Colors.orange);
       return;
     }
 
-    _showSnackBar('${product.name} sepete ekleniyor...', Colors.grey);
+    _showSnackBar('${product.name} is being added to cart...', Colors.grey);
 
     final String apiUrl = '$API_BASE_URL/api/CartItem';
     try {
@@ -259,36 +209,29 @@ class _FavoritesPageState extends State<FavoritesPage> {
         body: jsonEncode({
           'userId': _currentUserId,
           'productId': product.id,
-          'quantity': 1, // Varsayılan olarak 1 adet eklensin
+          'quantity': 1,
         }),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // 200 OK veya 201 Created
-        _showSnackBar('"${product.name}" sepete eklendi!', Colors.green);
-        print('Product added to cart successfully: ${product.name}');
+        _showSnackBar('"${product.name}" added to cart!', Colors.green);
       } else {
-        String errorMessage = 'Sepete ekleme başarısız: ${response.statusCode}';
+        String errorMessage = 'Failed to add to cart: ${response.statusCode}';
         dynamic errorBody;
         try {
           errorBody = jsonDecode(response.body);
           errorMessage =
               errorBody['message'] ?? errorBody['detail'] ?? errorMessage;
-        } catch (e) {
-          print('Error parsing error body: $e');
-        }
+        } catch (e) {}
         _showSnackBar(errorMessage, Colors.red);
-        print('Cart API Add Error: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      _showSnackBar('Bir ağ hatası oluştu: $e', Colors.red);
-      print('Error adding to cart: $e');
+      _showSnackBar('A network error occurred: $e', Colors.red);
     }
   }
 
   void _showSnackBar(String message, Color color) {
     if (mounted) {
-      // Widget hala ağaçtaysa snackbar gösterebiliriz
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(
         context,
@@ -325,8 +268,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
                   ? Center(
                     child: Text(
                       _currentUserId == null
-                          ? 'Favori ürünleri görmek için giriş yapın.'
-                          : 'Henüz favori ürününüz bulunmamaktadır.',
+                          ? 'Please log in to see favorite products.'
+                          : 'You have no favorite products yet.',
                       style: GoogleFonts.poppins(
                         color: ColorPalette.black,
                         fontSize: 18,
@@ -363,10 +306,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                     height: height,
                                     product: product,
                                     onRemove: () => _removeFavorite(product.id),
-                                    onAddToCart:
-                                        () => _addToCart(
-                                          product,
-                                        ), // <<< Yeni eklenen kısım
+                                    onAddToCart: () => _addToCart(product),
                                     imagePath: product.mainPictureUrl,
                                   ),
                                 ),
@@ -396,7 +336,7 @@ class FavoriteProductItem extends StatelessWidget {
     required this.product,
     required this.onRemove,
     required this.imagePath,
-    required this.onAddToCart, // <<< Yeni eklenen callback
+    required this.onAddToCart,
   });
 
   final double width;
@@ -404,7 +344,7 @@ class FavoriteProductItem extends StatelessWidget {
   final Product product;
   final VoidCallback onRemove;
   final String imagePath;
-  final VoidCallback onAddToCart; // <<< Yeni callback tanımı
+  final VoidCallback onAddToCart;
 
   @override
   Widget build(BuildContext context) {
@@ -470,10 +410,9 @@ class FavoriteProductItem extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const SizedBox(width: 2), // Little space for alignment
+                      const SizedBox(width: 2),
                       GestureDetector(
-                        onTap:
-                            onAddToCart, // <<< Buraya yeni callback'i bağladık
+                        onTap: onAddToCart,
                         child: Container(
                           width: width * 0.3,
                           height: height * 0.04,

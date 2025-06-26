@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:scuba_diving/colors/color_palette.dart';
 import 'package:scuba_diving/screens/profile%20items/address_form_page.dart';
-import 'package:scuba_diving/screens/profile%20items/contact_info_page.dart'
-    show ContactInfoPage;
+import 'package:scuba_diving/screens/profile%20items/contact_info_page.dart';
 import 'package:scuba_diving/screens/forgot%20passwords/forgot_password_page.dart';
 import 'package:scuba_diving/screens/profile%20items/languages_page.dart';
 import 'package:scuba_diving/screens/login_page.dart';
@@ -57,23 +56,19 @@ class _ProfilePageState extends State<ProfilePage> {
       ProfileItemModel(Icons.logout_outlined, "Log Out", (context) async {
         final prefs = await SharedPreferences.getInstance();
 
-        // Kullanıcının giriş durumunu false yap
         await prefs.setBool('isLoggedIn', false);
 
-        // userId'yi Shared Preferences'tan sil
         await prefs.remove('userId');
-        print('userId Shared Preferences\'tan silindi.');
+        print('userId removed from Shared Preferences.');
 
-        // authToken'u Shared Preferences'tan sil (JWT'yi kaydettiyseniz)
         await prefs.remove('authToken');
-        print('authToken Shared Preferences\'tan silindi.');
+        print('authToken removed from Shared Preferences.');
 
-        // Tüm geçmiş rotaları temizleyerek Loginpage'e yönlendir
         if (context.mounted) {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const Loginpage()),
-            (route) => false, // Tüm geçmiş rotaları temizle
+            (route) => false,
           );
         }
       }),
@@ -175,7 +170,7 @@ class ProfileItem extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Icon(
+                  const Icon(
                     Icons.arrow_forward_ios_outlined,
                     color: ColorPalette.black,
                     size: 20,

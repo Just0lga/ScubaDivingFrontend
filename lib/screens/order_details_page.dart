@@ -4,15 +4,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:scuba_diving/screens/product_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:intl/intl.dart'; // Tarih formatlama için
+import 'package:intl/intl.dart';
 
 import 'package:scuba_diving/colors/color_palette.dart';
-import 'package:scuba_diving/main.dart'; // API_BASE_URL için
-import 'package:scuba_diving/models/order.dart'; // Order modelini import edin
-import 'package:scuba_diving/models/order_item.dart'; // Yeni OrderItem modelini import edin
+import 'package:scuba_diving/main.dart';
+import 'package:scuba_diving/models/order.dart';
+import 'package:scuba_diving/models/order_item.dart';
 
 class OrderDetailsPage extends StatefulWidget {
-  final Order order; // MyOrdersPage'ten gelecek olan sipariş objesi
+  final Order order;
 
   const OrderDetailsPage({Key? key, required this.order}) : super(key: key);
 
@@ -231,12 +231,14 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                 final item = _orderItems[index];
                                 return GestureDetector(
                                   onTap: () {
+                                    print("YYYY ${item.productId}");
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder:
-                                            (context) =>
-                                                ProductPage(productId: item.id),
+                                            (context) => ProductPage(
+                                              productId: item.productId,
+                                            ),
                                       ),
                                     );
                                   },

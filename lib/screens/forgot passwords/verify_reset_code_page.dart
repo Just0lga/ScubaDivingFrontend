@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:scuba_diving/colors/color_palette.dart';
 import 'package:scuba_diving/main.dart'; // For API_BASE_URL
-import 'package:scuba_diving/screens/login_page.dart'; // For navigating to LoginPage (Adjust with your LoginPage's path)
+import 'package:scuba_diving/screens/login_page.dart'; // For navigating to LoginPage
 import 'package:scuba_diving/widgets/forgot_password_text_field.dart';
 
 class VerifyResetCodePage extends StatefulWidget {
@@ -161,29 +161,24 @@ class _VerifyResetCodePageState extends State<VerifyResetCodePage> {
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               readOnly: true,
-              prefixIcon: Icon(
-                Icons.email,
-                color: ColorPalette.black,
-              ), // Use black for consistency
+              prefixIcon: const Icon(Icons.email, color: ColorPalette.black),
               hintText: 'example@email.com',
             ),
             SizedBox(height: height * 0.02),
-            // Code field using ScubaTextField
             ForgotPasswordTextField(
               label: 'Verification Code',
               controller: _codeController,
               keyboardType: TextInputType.number,
-              prefixIcon: Icon(Icons.vpn_key, color: ColorPalette.black),
+              prefixIcon: const Icon(Icons.vpn_key, color: ColorPalette.black),
               hintText: 'Enter the code sent to you',
             ),
             SizedBox(height: height * 0.02),
-            // New Password field using ScubaTextField
             ForgotPasswordTextField(
               label: 'New Password',
               controller: _newPasswordController,
               obscureText: !_isPasswordVisible,
               hintText: 'At least 6 characters',
-              prefixIcon: Icon(Icons.lock, color: ColorPalette.black),
+              prefixIcon: const Icon(Icons.lock, color: ColorPalette.black),
               suffixIcon: Icon(
                 _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
                 color: ColorPalette.black,

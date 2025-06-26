@@ -10,6 +10,12 @@ class TakeInfo extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: ColorPalette.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         centerTitle: true,
         iconTheme: const IconThemeData(color: ColorPalette.white),
         title: Text(
@@ -24,7 +30,6 @@ class TakeInfo extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          // Arka plan resmi
           Positioned.fill(
             child: Image.asset(
               'images/login_page_background.jpg',
@@ -32,7 +37,6 @@ class TakeInfo extends StatelessWidget {
             ),
           ),
 
-          // Sayfa içeriği (şeffaf arkaplanlı kartlar)
           SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -75,9 +79,9 @@ class TakeInfo extends StatelessWidget {
     List<Widget>? children,
   }) {
     return Card(
-      color: ColorPalette.cardColor.withOpacity(0.85), // hafif şeffaf
+      color: ColorPalette.cardColor.withOpacity(0.85),
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

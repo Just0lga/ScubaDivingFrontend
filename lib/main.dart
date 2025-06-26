@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:scuba_diving/colors/color_palette.dart';
 import 'package:scuba_diving/screens/category_page.dart';
-import 'package:scuba_diving/screens/picture/upload_photo_page.dart';
 import 'package:scuba_diving/screens/take_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:scuba_diving/screens/login_page.dart';
@@ -14,9 +13,8 @@ import 'package:scuba_diving/screens/main_page.dart';
 
 String? API_BASE_URL;
 void main() async {
-  // Allow all certificates in development (DANGER! Do not use in production)
   HttpOverrides.global = MyHttpOverrides();
-  API_BASE_URL = 'https://192.168.2.9:7096';
+  API_BASE_URL = 'https://justolga.site/api';
 
   runApp(const MyApp());
 }

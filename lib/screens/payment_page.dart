@@ -7,12 +7,11 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:scuba_diving/colors/color_palette.dart';
 import 'package:scuba_diving/main.dart';
 import 'package:scuba_diving/models/address.dart';
-import 'package:scuba_diving/models/product.dart'; // Import Product model
-import 'package:scuba_diving/screens/home_page.dart'; // For navigating back to Home page
-import 'package:scuba_diving/screens/login_page.dart'; // For navigating back to Login page
-import 'package:scuba_diving/screens/order_confirmation_page.dart'; // New order confirmation page
+import 'package:scuba_diving/models/product.dart';
+import 'package:scuba_diving/screens/login_page.dart';
+import 'package:scuba_diving/screens/order_confirmation_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:scuba_diving/widgets/credit_cart_text_field.dart'; // Import the new custom CreditCartTextField
+import 'package:scuba_diving/widgets/credit_cart_text_field.dart';
 
 class PaymentPage extends StatefulWidget {
   final List<Product> cartProducts;
@@ -35,18 +34,16 @@ class _PaymentPageState extends State<PaymentPage> {
   String? _authToken;
   bool _isLoading = true;
   List<Address> _addresses = [];
-  int? _selectedAddressId; // ID of the selected address
+  int? _selectedAddressId;
 
   final TextEditingController _paymentMethodController = TextEditingController(
     text: "Credit Card",
-  ); // Default payment method
-  final TextEditingController _cardNumberController =
-      TextEditingController(); // Card Number
-  final TextEditingController _expiryDateController =
-      TextEditingController(); // Expiry Date
-  final TextEditingController _cvvController = TextEditingController(); // CVV
+  );
+  final TextEditingController _cardNumberController = TextEditingController();
+  final TextEditingController _expiryDateController = TextEditingController();
+  final TextEditingController _cvvController = TextEditingController();
   final TextEditingController _cardHolderNameController =
-      TextEditingController(); // Card Holder Name
+      TextEditingController();
 
   @override
   void initState() {
@@ -64,7 +61,6 @@ class _PaymentPageState extends State<PaymentPage> {
     super.dispose();
   }
 
-  // Load user data and fetch addresses
   Future<void> _loadUserDataAndFetchAddresses() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     _currentUserId = prefs.getString('userId');
@@ -82,7 +78,6 @@ class _PaymentPageState extends State<PaymentPage> {
     }
   }
 
-  // Fetch user's registered addresses from backend
   Future<void> _fetchUserAddresses(String userId, String authToken) async {
     final String apiUrl = '$API_BASE_URL/api/Address/all/$userId';
 
@@ -100,7 +95,6 @@ class _PaymentPageState extends State<PaymentPage> {
         setState(() {
           _addresses =
               addressData.map((json) => Address.fromJson(json)).toList();
-          // Select default address or the first address
           if (_addresses.isNotEmpty) {
             _selectedAddressId =
                 _addresses
@@ -131,9 +125,7 @@ class _PaymentPageState extends State<PaymentPage> {
     }
   }
 
-  // Initiate Payment Process (Order, OrderItem, Payment)
   Future<void> _processPayment() async {
-    // --- Start Client-Side Validations ---
     if (_currentUserId == null || _authToken == null) {
       _showSnackBar('You need to be logged in.', Colors.red);
       return;
@@ -154,7 +146,6 @@ class _PaymentPageState extends State<PaymentPage> {
       return;
     }
     if (_cardNumberController.text.trim().length < 16) {
-      // Assuming 16 digits for full card number
       _showSnackBar('Please enter a valid 16-digit card number.', Colors.red);
       return;
     }
@@ -180,16 +171,14 @@ class _PaymentPageState extends State<PaymentPage> {
       _showSnackBar('Card Holder Name cannot be empty.', Colors.red);
       return;
     }
-    // --- End Client-Side Validations ---
 
     setState(() {
-      _isLoading = true; // Start loading state
+      _isLoading = true;
     });
 
     try {
       int? orderId;
 
-      // 1. Create Order
       final orderApiUrl = '$API_BASE_URL/api/Order';
       final orderBody = jsonEncode({
         'userId': _currentUserId,
@@ -219,7 +208,6 @@ class _PaymentPageState extends State<PaymentPage> {
         );
       }
 
-      // 2. Create Order Items
       for (var product in widget.cartProducts) {
         final orderItemApiUrl = '$API_BASE_URL/api/OrderItem';
         final orderItemBody = jsonEncode({
@@ -250,16 +238,14 @@ class _PaymentPageState extends State<PaymentPage> {
       }
       _showSnackBar('Order items successfully added.', Colors.green);
 
-      // 3. Record Payment
       final paymentApiUrl = '$API_BASE_URL/api/Payment';
       final paymentBody = jsonEncode({
         'userId': _currentUserId,
         'orderId': orderId,
         'amount': widget.totalAmount,
         'method': _paymentMethodController.text.trim(),
-        'status': 'Completed', // Assuming successful payment
-        'transactionId':
-            'TRX-${DateTime.now().millisecondsSinceEpoch}', // Simple transaction ID
+        'status': 'Completed',
+        'transactionId': 'TRX-${DateTime.now().millisecondsSinceEpoch}',
       });
       print('Payment POST request to: $paymentApiUrl with body: $paymentBody');
       final paymentResponse = await http.post(
@@ -280,8 +266,6 @@ class _PaymentPageState extends State<PaymentPage> {
         );
       }
 
-      // 4. Clear Cart (from Backend)
-      // Since CartItem deletion endpoint removes individual items, we loop through all products to clear.
       for (var product in widget.cartProducts) {
         final deleteCartItemUrl =
             '$API_BASE_URL/api/CartItem/$_currentUserId/${product.id}';
@@ -295,7 +279,6 @@ class _PaymentPageState extends State<PaymentPage> {
       }
       print('Cart items cleared from backend.');
 
-      // All operations successful, navigate to confirmation page
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
@@ -306,7 +289,6 @@ class _PaymentPageState extends State<PaymentPage> {
         (Route<dynamic> route) => false,
       );
     } catch (e) {
-      // Show error message and navigate to confirmation page with failure status
       print('An error occurred during payment process: $e');
       _showSnackBar('Payment failed: ${e.toString()}', Colors.red);
       Navigator.pushAndRemoveUntil(
@@ -322,7 +304,7 @@ class _PaymentPageState extends State<PaymentPage> {
       );
     } finally {
       setState(() {
-        _isLoading = false; // End loading state
+        _isLoading = false;
       });
     }
   }
@@ -343,7 +325,7 @@ class _PaymentPageState extends State<PaymentPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Payment", // Translated
+          "Payment",
           style: GoogleFonts.poppins(
             color: ColorPalette.white,
             fontSize: 24,
@@ -369,7 +351,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Select Delivery Address:", // Translated
+                      "Select Delivery Address:",
                       style: GoogleFonts.poppins(
                         color: ColorPalette.black,
                         fontSize: 18,
@@ -379,7 +361,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     SizedBox(height: height * 0.01),
                     _addresses.isEmpty
                         ? Text(
-                          'No registered addresses found. Please add an address.', // Translated
+                          'No registered addresses found. Please add an address.',
                           style: GoogleFonts.poppins(color: Colors.red),
                         )
                         : DropdownButtonFormField<int>(
@@ -389,7 +371,7 @@ class _PaymentPageState extends State<PaymentPage> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            labelText: 'Select Address', // Translated
+                            labelText: 'Select Address',
                             labelStyle: GoogleFonts.poppins(
                               color: ColorPalette.black70,
                             ),
@@ -398,12 +380,11 @@ class _PaymentPageState extends State<PaymentPage> {
                               color: ColorPalette.primary,
                             ),
                             focusedBorder: OutlineInputBorder(
-                              // Changed this
                               borderRadius: BorderRadius.circular(10),
                               borderSide: BorderSide(
                                 color: ColorPalette.primary,
                                 width: 2,
-                              ), // Now blue!
+                              ),
                             ),
                           ),
                           items:
@@ -433,7 +414,7 @@ class _PaymentPageState extends State<PaymentPage> {
                         ),
                     SizedBox(height: height * 0.03),
                     Text(
-                      "Cart Summary:", // Translated
+                      "Cart Summary:",
                       style: GoogleFonts.poppins(
                         color: ColorPalette.black,
                         fontSize: 18,
@@ -482,7 +463,7 @@ class _PaymentPageState extends State<PaymentPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Total Amount:", // Translated
+                            "Total Amount:",
                             style: GoogleFonts.poppins(
                               color: ColorPalette.black,
                               fontSize: 18,
@@ -502,7 +483,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     ),
                     SizedBox(height: height * 0.03),
                     Text(
-                      "Payment Information:", // Translated
+                      "Payment Information:",
                       style: GoogleFonts.poppins(
                         color: ColorPalette.black,
                         fontSize: 18,
@@ -510,9 +491,8 @@ class _PaymentPageState extends State<PaymentPage> {
                       ),
                     ),
                     SizedBox(height: height * 0.02),
-                    // Card Number
                     CreditCartTextField(
-                      label: 'Card Number', // Translated
+                      label: 'Card Number',
                       controller: _cardNumberController,
                       keyboardType: TextInputType.number,
                       prefixIcon: Icon(
@@ -531,7 +511,7 @@ class _PaymentPageState extends State<PaymentPage> {
                       children: [
                         Expanded(
                           child: CreditCartTextField(
-                            label: 'Expiry Date (MM/YY)', // Translated
+                            label: 'Expiry Date (MM/YY)',
                             controller: _expiryDateController,
                             keyboardType: TextInputType.datetime,
                             prefixIcon: Icon(
@@ -543,13 +523,13 @@ class _PaymentPageState extends State<PaymentPage> {
                               FilteringTextInputFormatter.digitsOnly,
                               ExpiryDateFormatter(),
                             ],
-                            maxLength: 5, // MM/YY includes 4 digits and 1 slash
+                            maxLength: 5,
                           ),
                         ),
                         SizedBox(width: width * 0.04),
                         Expanded(
                           child: CreditCartTextField(
-                            label: 'CVV', // Translated
+                            label: 'CVV',
                             controller: _cvvController,
                             keyboardType: TextInputType.number,
                             obscureText: true,
@@ -569,16 +549,15 @@ class _PaymentPageState extends State<PaymentPage> {
                     ),
                     SizedBox(height: height * 0.02),
                     CreditCartTextField(
-                      label: 'Card Holder Name', // Translated
+                      label: 'Card Holder Name',
                       controller: _cardHolderNameController,
                       keyboardType: TextInputType.text,
                       prefixIcon: Icon(Icons.person, color: ColorPalette.black),
-                      hintText: 'First Name Last Name', // Translated
+                      hintText: 'First Name Last Name',
                     ),
                     SizedBox(height: height * 0.03),
-                    // The ElevatedButton is now wrapped in a SizedBox to expand its width
                     SizedBox(
-                      width: double.infinity, // Occupy maximum available width
+                      width: double.infinity,
                       child: ElevatedButton(
                         onPressed: _processPayment,
                         style: ElevatedButton.styleFrom(
@@ -586,15 +565,14 @@ class _PaymentPageState extends State<PaymentPage> {
                           foregroundColor: ColorPalette.white,
                           padding: EdgeInsets.symmetric(
                             vertical: height * 0.02,
-                            horizontal:
-                                20, // Adjusted horizontal padding for a better look
+                            horizontal: 20,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                         child: Text(
-                          "Complete Payment", // Translated
+                          "Complete Payment",
                           style: GoogleFonts.poppins(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

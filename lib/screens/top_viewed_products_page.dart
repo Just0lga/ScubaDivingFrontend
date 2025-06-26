@@ -23,28 +23,27 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
   List<Product> _products = [];
   bool _isLoading = false;
   int _pageNumber = 1;
-  final int _pageSize = 12; // Her sayfada 12 ürün gösterilecek
-  bool _hasMore = true; // Daha yüklenecek ürün olup olmadığını kontrol eder
+  final int _pageSize = 12;
+  bool _hasMore = true;
   final ScrollController _scrollController = ScrollController();
 
-  // Favori işlemleri için gerekli state değişkenleri
-  String? _currentUserId; // Mevcut kullanıcının ID'si
-  Set<int> _favoriteProductIds = {}; // Kullanıcının favori ürün ID'leri seti
-  Set<int> _cartProductIds = {}; // Kullanıcının favori ürün ID'lerini tutar
+  String? _currentUserId;
+  Set<int> _favoriteProductIds = {};
+  Set<int> _cartProductIds = {};
 
   @override
   void initState() {
     super.initState();
-    _loadUserDataAndFavorites(); // Kullanıcı ID'sini ve favorileri yükle
+    _loadUserDataAndFavorites();
     _loadUserDataAndCartItems();
 
-    _fetchProducts(); // Ürünleri çek
+    _fetchProducts();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
               _scrollController.position.maxScrollExtent &&
           _hasMore &&
           !_isLoading) {
-        _fetchProducts(); // Listenin sonuna gelindiğinde ve daha fazla varsa yeni ürünleri çek
+        _fetchProducts();
       }
     });
   }
@@ -55,7 +54,6 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
     super.dispose();
   }
 
-  //CART ITEMS
   Future<void> _loadUserDataAndCartItems() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -67,17 +65,15 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
     }
   }
 
-  // Kullanıcının favori ürünlerini backend'den çek
   Future<void> _fetchUserCartItems(String userId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? authToken = prefs.getString('authToken');
 
     if (authToken == null) {
-      print('Auth Token bulunamadı. Favoriler çekilemedi.');
+      print('Auth Token not found. Cart items could not be fetched.');
       return;
     }
 
-    // Kullanıcının ID'sine göre favorileri çeken URL'niz
     final String apiUrl = '$API_BASE_URL/api/CartItem/$userId';
 
     try {
@@ -92,28 +88,23 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
       if (response.statusCode == 200) {
         final List<dynamic> cartData = jsonDecode(response.body);
         setState(() {
-          // Gelen JSON listesindeki her bir nesneden 'productId' değerini çek
           _cartProductIds =
-              cartData
-                  .map<int>(
-                    (item) => item['productId'] as int,
-                  ) // Her bir Map'ten productId'yi al
-                  .toSet(); // Benzersiz favori ID'leri için Set'e dönüştür
+              cartData.map<int>((item) => item['productId'] as int).toSet();
         });
-        print('Cart ürün ID\'leri başarıyla çekildi: $_cartProductIds');
+        print('Cart product IDs successfully fetched: $_cartProductIds');
       } else {
         print(
-          'Cart ürünleri çekilirken hata oluştu: ${response.statusCode} - ${response.body}',
+          'Failed to fetch cart items: ${response.statusCode} - ${response.body}',
         );
       }
     } catch (e) {
-      print('Cart ürünleri çekilirken ağ hatası oluştu: $e');
+      print('Network error occurred while fetching cart items: $e');
     }
   }
 
   Future<void> _addOrRemoveCart(int productId) async {
     if (_currentUserId == null) {
-      _showSnackBar('Carta eklemek için lütfen giriş yapın.', Colors.orange);
+      _showSnackBar('Please log in to add to cart.', Colors.orange);
       return;
     }
 
@@ -122,24 +113,19 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
 
     if (authToken == null) {
       _showSnackBar(
-        'Oturum token\'ı bulunamadı. Lütfen tekrar giriş yapın.',
+        'Session token not found. Please log in again.',
         Colors.orange,
       );
       return;
     }
 
-    final bool isCurrentlyCart = _cartProductIds.contains(
-      productId,
-    ); // Mevcut durumu kontrol et
+    final bool isCurrentlyCart = _cartProductIds.contains(productId);
 
-    // Optimistik güncelleme: UI'yı önce güncelle
     setState(() {
       if (isCurrentlyCart) {
-        _cartProductIds.remove(
-          productId,
-        ); // Favoriden kaldırılacaksa setten çıkar
+        _cartProductIds.remove(productId);
       } else {
-        _cartProductIds.add(productId); // Favoriye eklenecekse sete ekle
+        _cartProductIds.add(productId);
       }
     });
 
@@ -147,7 +133,6 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
       http.Response response;
 
       if (isCurrentlyCart) {
-        // Ürün şu anda favorilerde ise -> FAVORİDEN KALDIR (DELETE isteği)
         final String deleteUrl =
             '$API_BASE_URL/api/CartItem/$_currentUserId/$productId';
         print('Sending DELETE request to: $deleteUrl');
@@ -159,7 +144,6 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
           },
         );
       } else {
-        // Ürün şu anda favorilerde değil ise -> FAVORİYE EKLE (POST isteği)
         final String postUrl = '$API_BASE_URL/api/CartItem';
         final cart = Cart(
           userId: _currentUserId!,
@@ -181,29 +165,22 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
       if (response.statusCode == 200 ||
           response.statusCode == 201 ||
           response.statusCode == 204) {
-        // 200 OK (Genel başarı), 201 Created (Ekleme Başarısı), 204 No Content (DELETE Başarısı)
         _showSnackBar(
-          isCurrentlyCart ? 'Cart kaldırıldı!' : 'Cart eklendi!',
+          isCurrentlyCart ? 'Removed from cart!' : 'Added to cart!',
           Colors.green,
         );
         print(
           'Cart operation success: ${response.statusCode} - ${response.body}',
         );
-        // UI zaten optimistik olarak güncellendi. Ekstra bir setState burada gerekli değil.
       } else {
-        // Hata oluştu, UI'yı eski durumuna geri al
         setState(() {
           if (isCurrentlyCart) {
-            _cartProductIds.add(
-              productId,
-            ); // Kaldırmıştık, hata oldu, geri ekle
+            _cartProductIds.add(productId);
           } else {
-            _cartProductIds.remove(
-              productId,
-            ); // Eklememiştik, hata oldu, geri kaldır
+            _cartProductIds.remove(productId);
           }
         });
-        String errorMessage = 'Favori işlemi başarısız: ${response.statusCode}';
+        String errorMessage = 'Cart operation failed: ${response.statusCode}';
         try {
           final errorBody = jsonDecode(response.body);
           errorMessage = errorBody['message'] ?? errorMessage;
@@ -214,7 +191,6 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
         print('Cart API Error: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      // Ağ hatası oluştu, UI'yı eski durumuna geri al
       setState(() {
         if (isCurrentlyCart) {
           _cartProductIds.add(productId);
@@ -222,21 +198,14 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
           _cartProductIds.remove(productId);
         }
       });
-      _showSnackBar('Bir ağ hatası oluştu: $e', Colors.red);
-      print('Error sending favorite request: $e');
+      _showSnackBar('A network error occurred: $e', Colors.red);
+      print('Error sending cart request: $e');
     }
   }
 
-  /// Kullanıcının kimlik bilgilerini yükler ve favorileri çeker.
   Future<void> _loadUserDataAndFavorites() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? userId = prefs.getString('userId');
-    // Eğer userId JWT'den deşifre ediliyorsa aşağıdaki satırı kullanabilirsiniz:
-    // final String? authToken = prefs.getString('authToken');
-    // if (authToken != null && !JwtDecoder.isExpired(authToken)) {
-    //   Map<String, dynamic> decodedToken = JwtDecoder.decode(authToken);
-    //   userId = decodedToken['id'] ?? decodedToken['sub']; // JWT'deki userId alanı
-    // }
 
     setState(() {
       _currentUserId = userId;
@@ -245,17 +214,16 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
     if (_currentUserId != null) {
       await _fetchUserFavorites(_currentUserId!);
     } else {
-      print('Kullanıcı ID\'si bulunamadı, favoriler yüklenemedi.');
+      print('User ID not found, favorites could not be loaded.');
     }
   }
 
-  /// Kullanıcının favori ürünlerini API'den çeker.
   Future<void> _fetchUserFavorites(String userId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? authToken = prefs.getString('authToken');
 
     if (authToken == null) {
-      print('Auth Token bulunamadı. Favoriler çekilemedi.');
+      print('Auth Token not found. Favorites could not be fetched.');
       return;
     }
 
@@ -276,21 +244,22 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
           _favoriteProductIds =
               favoriteData.map<int>((item) => item['productId'] as int).toSet();
         });
-        print('Favori ürün ID\'leri başarıyla çekildi: $_favoriteProductIds');
+        print(
+          'Favorite product IDs successfully fetched: $_favoriteProductIds',
+        );
       } else {
         print(
-          'Favori ürünleri çekilirken hata oluştu: ${response.statusCode} - ${response.body}',
+          'Failed to fetch favorite products: ${response.statusCode} - ${response.body}',
         );
       }
     } catch (e) {
-      print('Favori ürünleri çekilirken ağ hatası oluştu: $e');
+      print('Network error occurred while fetching favorite products: $e');
     }
   }
 
-  /// Bir ürünü favorilere ekler veya favorilerden kaldırır.
   Future<void> _addOrRemoveFavorite(int productId) async {
     if (_currentUserId == null) {
-      _showSnackBar('Favori eklemek için lütfen giriş yapın.', Colors.orange);
+      _showSnackBar('Please log in to add to favorites.', Colors.orange);
       return;
     }
 
@@ -299,7 +268,7 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
 
     if (authToken == null) {
       _showSnackBar(
-        'Oturum token\'ı bulunamadı. Lütfen tekrar giriş yapın.',
+        'Session token not found. Please log in again.',
         Colors.orange,
       );
       return;
@@ -307,7 +276,6 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
 
     final bool isCurrentlyFavorited = _favoriteProductIds.contains(productId);
 
-    // Optimistik güncelleme: UI'yı önce güncelle
     setState(() {
       if (isCurrentlyFavorited) {
         _favoriteProductIds.remove(productId);
@@ -320,7 +288,6 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
       http.Response response;
 
       if (isCurrentlyFavorited) {
-        // Ürün şu anda favorilerde ise -> FAVORİDEN KALDIR (DELETE isteği)
         final String deleteUrl =
             '$API_BASE_URL/api/Favorites/$_currentUserId/$productId';
         print('Sending DELETE request to: $deleteUrl');
@@ -332,9 +299,7 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
           },
         );
       } else {
-        // Ürün şu anda favorilerde değil ise -> FAVORİYE EKLE (POST isteği)
         final String postUrl = '$API_BASE_URL/api/Favorites';
-        // Favorite modelini kullanarak favori objesi oluştur
         final favorite = Favorite(
           userId: _currentUserId!,
           productId: productId,
@@ -355,34 +320,34 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
           response.statusCode == 201 ||
           response.statusCode == 204) {
         _showSnackBar(
-          isCurrentlyFavorited ? 'Favori kaldırıldı!' : 'Favori eklendi!',
+          isCurrentlyFavorited
+              ? 'Removed from favorites!'
+              : 'Added to favorites!',
           Colors.green,
         );
         print(
           'Favorite operation success: ${response.statusCode} - ${response.body}',
         );
       } else {
-        // Hata oluştu, UI'yı eski durumuna geri al (rollback)
         setState(() {
           if (isCurrentlyFavorited) {
-            _favoriteProductIds.add(productId); // Kaldırılamadıysa geri ekle
+            _favoriteProductIds.add(productId);
           } else {
-            _favoriteProductIds.remove(productId); // Eklenemediyse geri kaldır
+            _favoriteProductIds.remove(productId);
           }
         });
-        String errorMessage = 'Favori işlemi başarısız: ${response.statusCode}';
+        String errorMessage =
+            'Favorite operation failed: ${response.statusCode}';
         try {
           final errorBody = jsonDecode(response.body);
           errorMessage = errorBody['message'] ?? errorMessage;
         } catch (e) {
-          // JSON ayrıştırma hatası, orijinal hata mesajını kullan
           print('Error parsing error body: $e');
         }
         _showSnackBar(errorMessage, Colors.red);
         print('Favorite API Error: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      // Ağ hatası oluştu, UI'yı eski durumuna geri al (rollback)
       setState(() {
         if (isCurrentlyFavorited) {
           _favoriteProductIds.add(productId);
@@ -390,7 +355,7 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
           _favoriteProductIds.remove(productId);
         }
       });
-      _showSnackBar('Bir ağ hatası oluştu: $e', Colors.red);
+      _showSnackBar('A network error occurred: $e', Colors.red);
       print('Error sending favorite request: $e');
     }
   }
@@ -421,13 +386,16 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
           }
         });
       } else {
-        _showSnackBar('Ürünler çekilemedi: ${response.statusCode}', Colors.red);
+        _showSnackBar(
+          'Failed to fetch products: ${response.statusCode}',
+          Colors.red,
+        );
         print(
           'Failed to load products: ${response.statusCode} - ${response.body}',
         );
       }
     } catch (e) {
-      _showSnackBar('Bir hata oluştu: $e', Colors.red);
+      _showSnackBar('An error occurred: $e', Colors.red);
       print('Error fetching products: $e');
     } finally {
       setState(() {
@@ -477,9 +445,7 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
                 ),
               )
               : _products.isEmpty && !_isLoading
-              ? const Center(
-                child: Text('En çok görüntülenen ürün bulunamadı.'),
-              )
+              ? const Center(child: Text('No most viewed products found.'))
               : GridView.builder(
                 controller: _scrollController,
                 padding: EdgeInsets.all(width * 0.04),
@@ -544,22 +510,17 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
                                   fileName: "${product.name}-1",
                                 ),
                               ),
-
-                              // Favori kalp ikonu burası!
                               IconButton(
                                 icon: Icon(
-                                  // Ürün favorilerdeyse dolu kalp, değilse boş kalp
                                   _favoriteProductIds.contains(product.id)
                                       ? Icons.favorite
                                       : Icons.favorite_border,
-                                  // Ürün favorilerdeyse kırmızı, değilse beyaz
                                   color:
                                       _favoriteProductIds.contains(product.id)
                                           ? Colors.red
                                           : Colors.white,
                                 ),
                                 onPressed: () {
-                                  // Favori ekleme/kaldırma işlemini çağır
                                   _addOrRemoveFavorite(product.id);
                                 },
                               ),
@@ -596,8 +557,7 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
                                   alignment: Alignment.bottomRight,
                                   child: Container(
                                     width: 25,
-                                    height:
-                                        25, // Added height for the container
+                                    height: 25,
                                     alignment: Alignment.center,
                                     decoration: BoxDecoration(
                                       color:
@@ -615,7 +575,6 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
                                     ),
                                     child: IconButton(
                                       icon: Icon(
-                                        // product.id'yi kullanarak kontrol ediyoruz
                                         _cartProductIds.contains(product.id)
                                             ? Icons.shopping_cart
                                             : Icons.shopping_cart_outlined,
@@ -628,9 +587,12 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
                                       onPressed: () {
                                         _addOrRemoveCart(product.id);
                                       },
-
-                                      padding: const EdgeInsets.all(1),
-                                      constraints: const BoxConstraints(),
+                                      padding: EdgeInsets.zero,
+                                      constraints: BoxConstraints.tightFor(
+                                        width: 25,
+                                        height: 25,
+                                      ),
+                                      visualDensity: VisualDensity.compact,
                                     ),
                                   ),
                                 ),

@@ -59,14 +59,10 @@ class _CartPageState extends State<CartPage> {
     if (_currentUserId != null && _authToken != null) {
       await _fetchUserCartItems(_currentUserId!, _authToken!);
     } else {
-      _showSnackBar(
-        'Sepet ürünlerini görüntülemek için giriş yapın.',
-        Colors.orange,
-      );
+      _showSnackBar('Please log in to view cart items.', Colors.orange);
       setState(() {
         _isLoadingCartItems = false;
       });
-      print('Kullanıcı ID\'si veya token\'ı bulunamadı, sepet yüklenemedi.');
     }
   }
 
@@ -108,36 +104,27 @@ class _CartPageState extends State<CartPage> {
               );
               fetchedCartProducts.add(Product.fromJson(productJson));
             } else {
-              print(
-                'Ürün detayı çekilemedi (ID: $productId): ${productResponse.statusCode} - ${productResponse.body}',
-              );
               _showSnackBar(
-                'Bazı sepet ürün detayları çekilemedi.',
+                'Some cart product details could not be fetched.',
                 Colors.orange,
               );
             }
           } catch (e) {
-            print('Ürün detayı çekerken hata oluştu (ID: $productId): $e');
-            _showSnackBar('Bazı sepet ürün detayları çekilemedi.', Colors.red);
+            _showSnackBar(
+              'An error occurred while fetching some cart product details.',
+              Colors.red,
+            );
           }
         }
         setState(() {
           _cartProductQuantities = fetchedProductQuantities;
           _cartProducts = fetchedCartProducts;
         });
-        print('Sepet ürün ID\'leri ve detayları başarıyla çekildi.');
       } else {
-        _showSnackBar(
-          'Sepet ürünleri çekilirken hata oluştu: ${response.statusCode}',
-          Colors.red,
-        );
-        print(
-          'Failed to load cart items: ${response.statusCode} - ${response.body}',
-        );
+        _showSnackBar('Your cart is empty', Colors.green);
       }
     } catch (e) {
-      _showSnackBar('Bir ağ hatası oluştu: $e', Colors.red);
-      print('Error fetching cart items: $e');
+      _showSnackBar('A network error occurred: $e', Colors.red);
     } finally {
       setState(() {
         _isLoadingCartItems = false;
@@ -147,7 +134,7 @@ class _CartPageState extends State<CartPage> {
 
   Future<void> _removeCartItem(int productId) async {
     if (_currentUserId == null || _authToken == null) {
-      _showSnackBar('Giriş yapmanız gerekiyor.', Colors.orange);
+      _showSnackBar('You need to be logged in.', Colors.orange);
       return;
     }
 
@@ -156,7 +143,7 @@ class _CartPageState extends State<CartPage> {
     );
 
     if (productToRemove == null) {
-      _showSnackBar('Sepette böyle bir ürün bulunamadı.', Colors.red);
+      _showSnackBar('Product not found in cart.', Colors.red);
       return;
     }
 
@@ -178,10 +165,10 @@ class _CartPageState extends State<CartPage> {
       );
 
       if (response.statusCode == 200 || response.statusCode == 204) {
-        _showSnackBar('Ürün sepetten kaldırıldı!', Colors.green);
+        _showSnackBar('Product removed from cart!', Colors.green);
       } else {
         String errorMessage =
-            'Sepetten kaldırma başarısız: ${response.statusCode}';
+            'Failed to remove from cart: ${response.statusCode}';
         dynamic errorBody;
         try {
           errorBody = jsonDecode(response.body);
@@ -191,22 +178,17 @@ class _CartPageState extends State<CartPage> {
               errorBody.toString() ??
               errorMessage;
         } catch (e) {
-          print('Error parsing error body: $e');
           errorMessage =
-              'Sepetten kaldırma başarısız: ${response.statusCode}. Yanıt gövdesi çözülemedi: ${response.body}';
+              'Failed to remove from cart: ${response.statusCode}. Response body could not be parsed: ${response.body}';
         }
         _showSnackBar(errorMessage, Colors.red);
-        print(
-          'Cart API Delete Error: ${response.statusCode} - ${response.body}',
-        );
         setState(() {
           _cartProducts.add(productToRemove);
           _cartProductQuantities[productId] = originalQuantity;
         });
       }
     } catch (e) {
-      _showSnackBar('Bir ağ hatası oluştu: $e', Colors.red);
-      print('Error deleting cart item: $e');
+      _showSnackBar('A network error occurred: $e', Colors.red);
       setState(() {
         _cartProducts.add(productToRemove);
         _cartProductQuantities[productId] = originalQuantity;
@@ -216,7 +198,7 @@ class _CartPageState extends State<CartPage> {
 
   Future<void> _updateCartItemQuantity(int productId, int newQuantity) async {
     if (_currentUserId == null || _authToken == null) {
-      _showSnackBar('Giriş yapmanız gerekiyor.', Colors.orange);
+      _showSnackBar('You need to be logged in.', Colors.orange);
       return;
     }
 
@@ -244,10 +226,10 @@ class _CartPageState extends State<CartPage> {
       );
 
       if (response.statusCode == 200 || response.statusCode == 204) {
-        _showSnackBar('Miktar güncellendi!', Colors.green);
+        _showSnackBar('Quantity updated!', Colors.green);
       } else {
         String errorMessage =
-            'Miktar güncelleme başarısız: ${response.statusCode}';
+            'Failed to update quantity: ${response.statusCode}';
         dynamic errorBody;
         try {
           errorBody = jsonDecode(response.body);
@@ -257,14 +239,10 @@ class _CartPageState extends State<CartPage> {
               errorBody.toString() ??
               errorMessage;
         } catch (e) {
-          print('Error parsing error body: $e');
           errorMessage =
-              'Miktar güncelleme başarısız: ${response.statusCode}. Yanıt gövdesi çözülemedi: ${response.body}';
+              'Failed to update quantity: ${response.statusCode}. Response body could not be parsed: ${response.body}';
         }
         _showSnackBar(errorMessage, Colors.red);
-        print(
-          'Cart API Update Error: ${response.statusCode} - ${response.body}',
-        );
         setState(() {
           if (oldQuantity != null) {
             _cartProductQuantities[productId] = oldQuantity;
@@ -272,8 +250,7 @@ class _CartPageState extends State<CartPage> {
         });
       }
     } catch (e) {
-      _showSnackBar('Bir ağ hatası oluştu: $e', Colors.red);
-      print('Error updating cart item quantity: $e');
+      _showSnackBar('A network error occurred: $e', Colors.red);
       setState(() {
         if (oldQuantity != null) {
           _cartProductQuantities[productId] = oldQuantity;
@@ -332,16 +309,14 @@ class _CartPageState extends State<CartPage> {
                   ? Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
-                      'Sepetinizde ürün bulunmamaktadır.',
+                      'Your cart is empty.',
                       style: GoogleFonts.poppins(fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
                   )
                   : ListView.builder(
-                    // <<< Expanded'ı kaldırdık
-                    shrinkWrap: true, // <<< Kendi içeriği kadar yer kaplasın
-                    physics:
-                        const NeverScrollableScrollPhysics(), // <<< Kendi içinde kaydırmayı devre dışı bırak
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: _cartProducts.length,
                     itemBuilder: (context, index) {
                       final product = _cartProducts[index];
@@ -365,23 +340,16 @@ class _CartPageState extends State<CartPage> {
 
                             child: Container(
                               color: ColorPalette.white,
-                              height:
-                                  height *
-                                  0.15, // Bu yükseklik, içeriğinize uygun olmalı
+                              height: height * 0.15,
                               padding: const EdgeInsets.symmetric(
                                 vertical: 8.0,
                                 horizontal: 8.0,
-                              ), // İç padding ekledik
+                              ),
                               child: Row(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment
-                                        .start, // Ürün başlığı yukarıda hizalansın
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Ürün Resmi
                                   Container(
-                                    width:
-                                        width *
-                                        0.25, // Genişliği biraz azalttık
+                                    width: width * 0.25,
                                     decoration: BoxDecoration(
                                       color: Colors.transparent,
                                       borderRadius: BorderRadius.circular(6),
@@ -392,29 +360,23 @@ class _CartPageState extends State<CartPage> {
                                       fileName: "${product.name}-1",
                                     ),
                                   ),
-                                  SizedBox(
-                                    width: width * 0.03,
-                                  ), // Resmi sağdan biraz daha ayırdık
+                                  SizedBox(width: width * 0.03),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       mainAxisAlignment:
-                                          MainAxisAlignment
-                                              .spaceBetween, // İçerikleri dikeyde yay
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        // Ürün Başlığı ve Silme Butonu
                                         Row(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment
-                                                  .start, // Başlık ve ikon aynı hizada
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Expanded(
                                               child: Text(
                                                 product.name,
                                                 overflow: TextOverflow.ellipsis,
-                                                maxLines:
-                                                    2, // İki satıra kadar sığdır
+                                                maxLines: 2,
                                                 style: GoogleFonts.poppins(
                                                   color: ColorPalette.black,
                                                   fontSize: 16,
@@ -429,18 +391,13 @@ class _CartPageState extends State<CartPage> {
                                               icon: Icon(
                                                 Icons.delete_outline,
                                                 color: ColorPalette.black,
-                                                size:
-                                                    20, // İkon boyutunu biraz küçülttük
+                                                size: 20,
                                               ),
-                                              padding:
-                                                  EdgeInsets
-                                                      .zero, // Padding'i kaldırdık
-                                              constraints:
-                                                  BoxConstraints(), // Kısıtlamaları kaldırdık
+                                              padding: EdgeInsets.zero,
+                                              constraints: BoxConstraints(),
                                             ),
                                           ],
                                         ),
-                                        // Ürün Fiyatı
                                         Text(
                                           "${product.price * quantity} \$",
                                           style: GoogleFonts.poppins(
@@ -448,17 +405,11 @@ class _CartPageState extends State<CartPage> {
                                             fontSize: 16,
                                           ),
                                         ),
-                                        // Miktar Kontrol Butonları
                                         Align(
-                                          // Butonları sağa yaslamak için Align kullandık
                                           alignment: Alignment.bottomRight,
                                           child: Container(
-                                            width:
-                                                width *
-                                                0.3, // Genişliği artırdık, ihtiyaca göre ayarla
-                                            height:
-                                                height *
-                                                0.035, // Yüksekliği biraz artırdık
+                                            width: width * 0.3,
+                                            height: height * 0.035,
                                             decoration: BoxDecoration(
                                               color: ColorPalette.black,
                                               borderRadius:
@@ -478,19 +429,15 @@ class _CartPageState extends State<CartPage> {
                                                   child: Icon(
                                                     Icons.remove,
                                                     color: ColorPalette.white,
-                                                    size:
-                                                        20, // İkon boyutunu biraz büyüttük
+                                                    size: 20,
                                                   ),
                                                 ),
                                                 Text(
                                                   quantity.toString(),
                                                   style: GoogleFonts.poppins(
                                                     color: ColorPalette.white,
-                                                    fontSize:
-                                                        20, // Metin boyutunu biraz düşürdük
-                                                    fontWeight:
-                                                        FontWeight
-                                                            .bold, // Kalın yapabiliriz
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
                                                 GestureDetector(
@@ -503,8 +450,7 @@ class _CartPageState extends State<CartPage> {
                                                   child: Icon(
                                                     Icons.add,
                                                     color: ColorPalette.white,
-                                                    size:
-                                                        20, // İkon boyutunu biraz büyüttük
+                                                    size: 20,
                                                   ),
                                                 ),
                                               ],
@@ -519,26 +465,6 @@ class _CartPageState extends State<CartPage> {
                             ),
                           ),
 
-                          /*CartItem(
-                              width: width,
-                              height: height,
-                              title: product.name,
-                              price: product.price * quantity,
-                              imagePath: imagePath,
-                              quantity: quantity,
-                              onRemove: () => _removeCartItem(product.id),
-                              onIncrease:
-                                  () => _updateCartItemQuantity(
-                                    product.id,
-                                    quantity + 1,
-                                  ),
-                              onDecrease:
-                                  () => _updateCartItemQuantity(
-                                    product.id,
-                                    quantity - 1,
-                                  ),
-                            ),
-                          ),*/
                           Container(
                             color: ColorPalette.black,
                             height: 0.3,
@@ -548,7 +474,6 @@ class _CartPageState extends State<CartPage> {
                       );
                     },
                   ),
-              // Aşağıdaki diğer widget'lar doğrudan Column'un çocukları olarak kalacak
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: GestureDetector(
@@ -722,7 +647,6 @@ class _CartPageState extends State<CartPage> {
   }
 }
 
-// CartItem widget'ı aynı kalabilir
 class CartItem extends StatelessWidget {
   const CartItem({
     super.key,
@@ -751,18 +675,13 @@ class CartItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: ColorPalette.cardColor,
-      height: height * 0.15, // Bu yükseklik, içeriğinize uygun olmalı
-      padding: const EdgeInsets.symmetric(
-        vertical: 8.0,
-        horizontal: 8.0,
-      ), // İç padding ekledik
+      height: height * 0.15,
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
       child: Row(
-        crossAxisAlignment:
-            CrossAxisAlignment.start, // Ürün başlığı yukarıda hizalansın
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Ürün Resmi
           Container(
-            width: width * 0.25, // Genişliği biraz azalttık
+            width: width * 0.25,
             decoration: BoxDecoration(
               color: Colors.grey,
               borderRadius: BorderRadius.circular(6),
@@ -772,23 +691,20 @@ class CartItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(width: width * 0.03), // Resmi sağdan biraz daha ayırdık
+          SizedBox(width: width * 0.03),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween, // İçerikleri dikeyde yay
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Ürün Başlığı ve Silme Butonu
                 Row(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start, // Başlık ve ikon aynı hizada
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: Text(
                         title,
                         overflow: TextOverflow.ellipsis,
-                        maxLines: 2, // İki satıra kadar sığdır
+                        maxLines: 2,
                         style: GoogleFonts.poppins(
                           color: ColorPalette.black,
                           fontSize: 16,
@@ -800,14 +716,13 @@ class CartItem extends StatelessWidget {
                       icon: Icon(
                         Icons.delete_outline,
                         color: ColorPalette.black,
-                        size: 20, // İkon boyutunu biraz küçülttük
+                        size: 20,
                       ),
-                      padding: EdgeInsets.zero, // Padding'i kaldırdık
-                      constraints: BoxConstraints(), // Kısıtlamaları kaldırdık
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(),
                     ),
                   ],
                 ),
-                // Ürün Fiyatı
                 Text(
                   "$price \$",
                   style: GoogleFonts.poppins(
@@ -815,14 +730,11 @@ class CartItem extends StatelessWidget {
                     fontSize: 16,
                   ),
                 ),
-                // Miktar Kontrol Butonları
                 Align(
-                  // Butonları sağa yaslamak için Align kullandık
                   alignment: Alignment.bottomRight,
                   child: Container(
-                    width:
-                        width * 0.3, // Genişliği artırdık, ihtiyaca göre ayarla
-                    height: height * 0.035, // Yüksekliği biraz artırdık
+                    width: width * 0.3,
+                    height: height * 0.035,
                     decoration: BoxDecoration(
                       color: ColorPalette.black,
                       borderRadius: BorderRadius.circular(6),
@@ -835,15 +747,15 @@ class CartItem extends StatelessWidget {
                           child: Icon(
                             Icons.remove,
                             color: ColorPalette.white,
-                            size: 20, // İkon boyutunu biraz büyüttük
+                            size: 20,
                           ),
                         ),
                         Text(
                           quantity.toString(),
                           style: GoogleFonts.poppins(
                             color: ColorPalette.white,
-                            fontSize: 20, // Metin boyutunu biraz düşürdük
-                            fontWeight: FontWeight.bold, // Kalın yapabiliriz
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                         GestureDetector(
@@ -851,7 +763,7 @@ class CartItem extends StatelessWidget {
                           child: Icon(
                             Icons.add,
                             color: ColorPalette.white,
-                            size: 20, // İkon boyutunu biraz büyüttük
+                            size: 20,
                           ),
                         ),
                       ],

@@ -26,45 +26,39 @@ class CategoryPage extends StatefulWidget {
 }
 
 class _CategoryPageState extends State<CategoryPage> {
-  List<Product> _products = []; // Görüntülenecek ürünlerin listesi
-  bool _isLoading = false; // Veri yükleniyor mu durumu
-  int _pageNumber = 1; // Mevcut sayfa numarası (sayfalama için)
-  final int _pageSize = 12; // Her sayfada gösterilecek ürün sayısı
-  bool _hasMore = true; // Daha fazla ürün olup olmadığını kontrol eder
-  final ScrollController _scrollController =
-      ScrollController(); // Liste kaydırma denetleyicisi
+  List<Product> _products = [];
+  bool _isLoading = false;
+  int _pageNumber = 1;
+  final int _pageSize = 12;
+  bool _hasMore = true;
+  final ScrollController _scrollController = ScrollController();
 
-  // Kullanıcı ve favori/sepet bilgileri için state değişkenleri
-  String? _currentUserId; // Mevcut kullanıcının ID'si
-  Set<int> _favoriteProductIds = {}; // Kullanıcının favori ürün ID'lerini tutar
-  Set<int> _cartProductIds =
-      {}; // Kullanıcının sepetindeki ürün ID'lerini tutar
+  String? _currentUserId;
+  Set<int> _favoriteProductIds = {};
+  Set<int> _cartProductIds = {};
 
   @override
   void initState() {
     super.initState();
-    _loadUserDataAndFavorites(); // Kullanıcı verilerini ve favorileri yükle
-    _loadUserDataAndCartItems(); // Kullanıcı verilerini ve sepet öğelerini yükle
+    _loadUserDataAndFavorites();
+    _loadUserDataAndCartItems();
 
-    // Scroll listener, listenin sonuna gelindiğinde yeni ürünleri yüklemek için
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
               _scrollController.position.maxScrollExtent &&
           _hasMore &&
           !_isLoading) {
-        _fetchProducts(); // Listenin sonuna gelindiğinde ve daha fazla varsa yeni ürünleri çek
+        _fetchProducts();
       }
     });
   }
 
   @override
   void dispose() {
-    _scrollController.dispose(); // Controller'ı dispose etmeyi unutmayın
+    _scrollController.dispose();
     super.dispose();
   }
 
-  // MARK: - Sepet İşlemleri
-  // Kullanıcı verilerini ve sepet öğelerini yükler
   Future<void> _loadUserDataAndCartItems() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -76,13 +70,11 @@ class _CategoryPageState extends State<CategoryPage> {
     }
   }
 
-  // Kullanıcının sepetindeki ürünleri backend'den çeker
   Future<void> _fetchUserCartItems(String userId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? authToken = prefs.getString('authToken');
 
     if (authToken == null) {
-      print('Auth Token bulunamadı. Sepet öğeleri çekilemedi.');
       return;
     }
 
@@ -103,21 +95,13 @@ class _CategoryPageState extends State<CategoryPage> {
           _cartProductIds =
               cartData.map<int>((item) => item['productId'] as int).toSet();
         });
-        print('Sepet ürün ID\'leri başarıyla çekildi: $_cartProductIds');
-      } else {
-        print(
-          'Sepet ürünleri çekilirken hata oluştu: ${response.statusCode} - ${response.body}',
-        );
-      }
-    } catch (e) {
-      print('Sepet ürünleri çekilirken ağ hatası oluştu: $e');
-    }
+      } else {}
+    } catch (e) {}
   }
 
-  // Ürünü sepete ekler veya sepetten kaldırır
   Future<void> _addOrRemoveCart(int productId) async {
     if (_currentUserId == null) {
-      _showSnackBar('Sepete eklemek için lütfen giriş yapın.', Colors.orange);
+      _showSnackBar('Please log in to add to cart.', Colors.orange);
       return;
     }
 
@@ -126,7 +110,7 @@ class _CategoryPageState extends State<CategoryPage> {
 
     if (authToken == null) {
       _showSnackBar(
-        'Oturum token\'ı bulunamadı. Lütfen tekrar giriş yapın.',
+        'Session token not found. Please log in again.',
         Colors.orange,
       );
       return;
@@ -134,7 +118,6 @@ class _CategoryPageState extends State<CategoryPage> {
 
     final bool isCurrentlyCart = _cartProductIds.contains(productId);
 
-    // Optimistik güncelleme: UI'yı önce güncelle
     setState(() {
       if (isCurrentlyCart) {
         _cartProductIds.remove(productId);
@@ -147,10 +130,8 @@ class _CategoryPageState extends State<CategoryPage> {
       http.Response response;
 
       if (isCurrentlyCart) {
-        // Ürün şu anda sepette ise -> SEPETTEN KALDIR (DELETE isteği)
         final String deleteUrl =
             '$API_BASE_URL/api/CartItem/$_currentUserId/$productId';
-        print('DELETE isteği gönderiliyor: $deleteUrl');
         response = await http.delete(
           Uri.parse(deleteUrl),
           headers: <String, String>{
@@ -159,7 +140,6 @@ class _CategoryPageState extends State<CategoryPage> {
           },
         );
       } else {
-        // Ürün şu anda sepette değil ise -> SEPTE EKLE (POST isteği)
         final String postUrl = '$API_BASE_URL/api/CartItem';
         final cart = Cart(
           userId: _currentUserId!,
@@ -167,7 +147,6 @@ class _CategoryPageState extends State<CategoryPage> {
           quantity: 1,
         );
         final String requestBody = jsonEncode(cart.toJson());
-        print('POST isteği gönderiliyor: $postUrl ile gövde: $requestBody');
         response = await http.post(
           Uri.parse(postUrl),
           headers: <String, String>{
@@ -182,33 +161,25 @@ class _CategoryPageState extends State<CategoryPage> {
           response.statusCode == 201 ||
           response.statusCode == 204) {
         _showSnackBar(
-          isCurrentlyCart ? 'Sepetten kaldırıldı!' : 'Sepete eklendi!',
+          isCurrentlyCart ? 'Removed from cart!' : 'Added to cart!',
           Colors.green,
         );
-        print(
-          'Sepet işlemi başarılı: ${response.statusCode} - ${response.body}',
-        );
       } else {
-        // Hata oluştu, UI'yı eski durumuna geri al
         setState(() {
           if (isCurrentlyCart) {
-            _cartProductIds.add(productId); // Kaldırılamadıysa geri ekle
+            _cartProductIds.add(productId);
           } else {
-            _cartProductIds.remove(productId); // Eklenemediyse geri kaldır
+            _cartProductIds.remove(productId);
           }
         });
-        String errorMessage = 'Sepet işlemi başarısız: ${response.statusCode}';
+        String errorMessage = 'Cart operation failed: ${response.statusCode}';
         try {
           final errorBody = jsonDecode(response.body);
           errorMessage = errorBody['message'] ?? errorMessage;
-        } catch (e) {
-          print('Hata gövdesi ayrıştırılırken hata oluştu: $e');
-        }
+        } catch (e) {}
         _showSnackBar(errorMessage, Colors.red);
-        print('Sepet API Hatası: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      // Ağ hatası oluştu, UI'yı eski durumuna geri al
       setState(() {
         if (isCurrentlyCart) {
           _cartProductIds.add(productId);
@@ -216,13 +187,10 @@ class _CategoryPageState extends State<CategoryPage> {
           _cartProductIds.remove(productId);
         }
       });
-      _showSnackBar('Bir ağ hatası oluştu: $e', Colors.red);
-      print('Sepet isteği gönderilirken hata: $e');
+      _showSnackBar('A network error occurred: $e', Colors.red);
     }
   }
 
-  // MARK: - Favori İşlemleri
-  // Kullanıcı ID'sini yükler ve favorileri çeker
   Future<void> _loadUserDataAndFavorites() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -232,17 +200,14 @@ class _CategoryPageState extends State<CategoryPage> {
     if (_currentUserId != null) {
       await _fetchUserFavorites(_currentUserId!);
     }
-    // Favori ürünler yüklendikten sonra ürünleri çek
     _fetchProducts();
   }
 
-  // Kullanıcının favori ürünlerini backend'den çeker
   Future<void> _fetchUserFavorites(String userId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? authToken = prefs.getString('authToken');
 
     if (authToken == null) {
-      print('Auth Token bulunamadı. Favoriler çekilemedi.');
       return;
     }
 
@@ -263,21 +228,13 @@ class _CategoryPageState extends State<CategoryPage> {
           _favoriteProductIds =
               favoriteData.map<int>((item) => item['productId'] as int).toSet();
         });
-        print('Favori ürün ID\'leri başarıyla çekildi: $_favoriteProductIds');
-      } else {
-        print(
-          'Favori ürünleri çekilirken hata oluştu: ${response.statusCode} - ${response.body}',
-        );
-      }
-    } catch (e) {
-      print('Favori ürünleri çekilirken ağ hatası oluştu: $e');
-    }
+      } else {}
+    } catch (e) {}
   }
 
-  // Bir ürünü favorilere ekler veya favorilerden kaldırır
   Future<void> _addOrRemoveFavorite(int productId) async {
     if (_currentUserId == null) {
-      _showSnackBar('Favori eklemek için lütfen giriş yapın.', Colors.orange);
+      _showSnackBar('Please log in to add to favorites.', Colors.orange);
       return;
     }
 
@@ -286,7 +243,7 @@ class _CategoryPageState extends State<CategoryPage> {
 
     if (authToken == null) {
       _showSnackBar(
-        'Oturum token\'ı bulunamadı. Lütfen tekrar giriş yapın.',
+        'Session token not found. Please log in again.',
         Colors.orange,
       );
       return;
@@ -294,7 +251,6 @@ class _CategoryPageState extends State<CategoryPage> {
 
     final bool isCurrentlyFavorited = _favoriteProductIds.contains(productId);
 
-    // Optimistik güncelleme: UI'yı önce güncelle
     setState(() {
       if (isCurrentlyFavorited) {
         _favoriteProductIds.remove(productId);
@@ -307,10 +263,8 @@ class _CategoryPageState extends State<CategoryPage> {
       http.Response response;
 
       if (isCurrentlyFavorited) {
-        // Ürün şu anda favorilerde ise -> FAVORİDEN KALDIR (DELETE isteği)
         final String deleteUrl =
             '$API_BASE_URL/api/Favorites/$_currentUserId/$productId';
-        print('DELETE isteği gönderiliyor: $deleteUrl');
         response = await http.delete(
           Uri.parse(deleteUrl),
           headers: <String, String>{
@@ -319,14 +273,12 @@ class _CategoryPageState extends State<CategoryPage> {
           },
         );
       } else {
-        // Ürün şu anda favorilerde değil ise -> FAVORİYE EKLE (POST isteği)
         final String postUrl = '$API_BASE_URL/api/Favorites';
         final favorite = Favorite(
           userId: _currentUserId!,
           productId: productId,
         );
         final String requestBody = jsonEncode(favorite.toJson());
-        print('POST isteği gönderiliyor: $postUrl ile gövde: $requestBody');
         response = await http.post(
           Uri.parse(postUrl),
           headers: <String, String>{
@@ -341,33 +293,28 @@ class _CategoryPageState extends State<CategoryPage> {
           response.statusCode == 201 ||
           response.statusCode == 204) {
         _showSnackBar(
-          isCurrentlyFavorited ? 'Favori kaldırıldı!' : 'Favori eklendi!',
+          isCurrentlyFavorited
+              ? 'Removed from favorites!'
+              : 'Added to favorites!',
           Colors.green,
         );
-        print(
-          'Favori işlemi başarılı: ${response.statusCode} - ${response.body}',
-        );
       } else {
-        // Hata oluştu, UI'yı eski durumuna geri al (rollback)
         setState(() {
           if (isCurrentlyFavorited) {
-            _favoriteProductIds.add(productId); // Kaldırılamadıysa geri ekle
+            _favoriteProductIds.add(productId);
           } else {
-            _favoriteProductIds.remove(productId); // Eklenemediyse geri kaldır
+            _favoriteProductIds.remove(productId);
           }
         });
-        String errorMessage = 'Favori işlemi başarısız: ${response.statusCode}';
+        String errorMessage =
+            'Favorite operation failed: ${response.statusCode}';
         try {
           final errorBody = jsonDecode(response.body);
           errorMessage = errorBody['message'] ?? errorMessage;
-        } catch (e) {
-          print('Hata gövdesi ayrıştırılırken hata: $e');
-        }
+        } catch (e) {}
         _showSnackBar(errorMessage, Colors.red);
-        print('Favori API Hatası: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      // Ağ hatası oluştu, UI'yı eski durumuna geri al (rollback)
       setState(() {
         if (isCurrentlyFavorited) {
           _favoriteProductIds.add(productId);
@@ -375,21 +322,17 @@ class _CategoryPageState extends State<CategoryPage> {
           _favoriteProductIds.remove(productId);
         }
       });
-      _showSnackBar('Bir ağ hatası oluştu: $e', Colors.red);
-      print('Favori isteği gönderilirken hata: $e');
+      _showSnackBar('A network error occurred: $e', Colors.red);
     }
   }
 
-  // MARK: - Ürün Yükleme
-  // Ürünleri API'den çeker
   Future<void> _fetchProducts() async {
-    if (_isLoading) return; // Zaten yükleniyorsa tekrar yükleme
+    if (_isLoading) return;
 
     setState(() {
-      _isLoading = true; // Yükleme durumunu başlat
+      _isLoading = true;
     });
 
-    // Yeni kategoriye özel API URL'si
     final String apiUrl =
         '$API_BASE_URL/api/Product/category/${widget.categoryId}/paged?PageNumber=$_pageNumber&PageSize=$_pageSize';
 
@@ -402,33 +345,27 @@ class _CategoryPageState extends State<CategoryPage> {
             productsJson.map((json) => Product.fromJson(json)).toList();
 
         setState(() {
-          _products.addAll(
-            fetchedProducts,
-          ); // Yeni ürünleri mevcut listeye ekle
-          _pageNumber++; // Sonraki sayfa için sayfa numarasını artır
+          _products.addAll(fetchedProducts);
+          _pageNumber++;
           if (fetchedProducts.length < _pageSize) {
-            _hasMore =
-                false; // Daha az ürün geldiyse yüklenecek başka ürün yok demektir
+            _hasMore = false;
           }
         });
       } else {
-        _showSnackBar('Ürünler çekilemedi: ${response.statusCode}', Colors.red);
-        print(
-          'Ürünler yüklenirken hata oluştu: ${response.statusCode} - ${response.body}',
+        _showSnackBar(
+          'Failed to fetch products: ${response.statusCode}',
+          Colors.red,
         );
       }
     } catch (e) {
-      _showSnackBar('Bir hata oluştu: $e', Colors.red);
-      print('Ürünler çekilirken hata: $e');
+      _showSnackBar('An error occurred: $e', Colors.red);
     } finally {
       setState(() {
-        _isLoading = false; // Yükleme durumunu sonlandır
+        _isLoading = false;
       });
     }
   }
 
-  // MARK: - Yardımcı Metotlar
-  // Kullanıcıya kısa bir bildirim (SnackBar) gösterir
   void _showSnackBar(String message, Color color) {
     ScaffoldMessenger.of(
       context,
@@ -470,7 +407,7 @@ class _CategoryPageState extends State<CategoryPage> {
                 ),
               )
               : _products.isEmpty && !_isLoading
-              ? const Center(child: Text('Bu kategoride ürün bulunamadı.'))
+              ? const Center(child: Text('No products found in this category.'))
               : GridView.builder(
                 controller: _scrollController,
                 padding: EdgeInsets.all(width * 0.04),
@@ -478,8 +415,7 @@ class _CategoryPageState extends State<CategoryPage> {
                   crossAxisCount: 2,
                   crossAxisSpacing: width * 0.04,
                   mainAxisSpacing: height * 0.02,
-                  childAspectRatio:
-                      0.7, // Kart boyutunu artırmak için düşürüldü (0.7'den 0.6'ya)
+                  childAspectRatio: 0.7,
                 ),
                 itemCount: _products.length + (_hasMore ? 1 : 0),
                 itemBuilder: (context, index) {
@@ -534,7 +470,6 @@ class _CategoryPageState extends State<CategoryPage> {
                                   fileName: "${product.name}-1",
                                 ),
                               ),
-                              // Favori kalp ikonu
                               IconButton(
                                 icon: Icon(
                                   _favoriteProductIds.contains(product.id)

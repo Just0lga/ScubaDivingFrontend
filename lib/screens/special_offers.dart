@@ -5,26 +5,27 @@ import 'package:http/http.dart' as http;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:scuba_diving/colors/color_palette.dart';
 import 'package:scuba_diving/main.dart';
-import 'package:scuba_diving/models/product.dart';
 import 'package:scuba_diving/models/cart.dart';
 import 'package:scuba_diving/models/favorite.dart';
+import 'package:scuba_diving/models/product.dart';
 import 'package:scuba_diving/screens/picture/picture.dart';
 import 'package:scuba_diving/screens/product_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ProductSearchPage extends StatefulWidget {
-  final String initialQuery;
-  const ProductSearchPage({super.key, this.initialQuery = ''});
+class SpecialOffers extends StatefulWidget {
+  const SpecialOffers({super.key});
 
   @override
-  State<ProductSearchPage> createState() => _ProductSearchPageState();
+  State<SpecialOffers> createState() => _SpecialOffersPageState();
 }
 
-class _ProductSearchPageState extends State<ProductSearchPage> {
-  final TextEditingController _searchController = TextEditingController();
-  List<Product> _searchResults = [];
+class _SpecialOffersPageState extends State<SpecialOffers> {
+  List<Product> _products = [];
   bool _isLoading = false;
-  String _currentQuery = '';
+  int _pageNumber = 1;
+  final int _pageSize = 12;
+  bool _hasMore = true;
+  final ScrollController _scrollController = ScrollController();
 
   String? _currentUserId;
   Set<int> _favoriteProductIds = {};
@@ -33,20 +34,22 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
   @override
   void initState() {
     super.initState();
-    _searchController.text = widget.initialQuery;
-    _currentQuery = widget.initialQuery;
-
     _loadUserDataAndFavorites();
     _loadUserDataAndCartItems();
 
-    if (_currentQuery.isNotEmpty) {
-      _searchProducts(_currentQuery);
-    }
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+              _scrollController.position.maxScrollExtent &&
+          _hasMore &&
+          !_isLoading) {
+        _fetchProducts();
+      }
+    });
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -66,7 +69,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
     final String? authToken = prefs.getString('authToken');
 
     if (authToken == null) {
-      print('Auth Token not found. Could not fetch cart items.');
+      print('Auth Token not found. Cart items could not be fetched.');
       return;
     }
 
@@ -87,14 +90,14 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
           _cartProductIds =
               cartData.map<int>((item) => item['productId'] as int).toSet();
         });
-        print('Cart product IDs fetched successfully: $_cartProductIds');
+        print('Cart product IDs successfully fetched: $_cartProductIds');
       } else {
         print(
-          'Error fetching cart items: ${response.statusCode} - ${response.body}',
+          'Failed to fetch cart items: ${response.statusCode} - ${response.body}',
         );
       }
     } catch (e) {
-      print('Network error fetching cart items: $e');
+      print('Network error occurred while fetching cart items: $e');
     }
   }
 
@@ -131,7 +134,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
       if (isCurrentlyCart) {
         final String deleteUrl =
             '$API_BASE_URL/api/CartItem/$_currentUserId/$productId';
-        print('Sending DELETE request: $deleteUrl');
+        print('Sending DELETE request to: $deleteUrl');
         response = await http.delete(
           Uri.parse(deleteUrl),
           headers: <String, String>{
@@ -147,7 +150,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
           quantity: 1,
         );
         final String requestBody = jsonEncode(cart.toJson());
-        print('Sending POST request: $postUrl with body: $requestBody');
+        print('Sending POST request to: $postUrl with body: $requestBody');
         response = await http.post(
           Uri.parse(postUrl),
           headers: <String, String>{
@@ -166,7 +169,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
           Colors.green,
         );
         print(
-          'Cart operation successful: ${response.statusCode} - ${response.body}',
+          'Cart operation success: ${response.statusCode} - ${response.body}',
         );
       } else {
         setState(() {
@@ -208,6 +211,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
     if (_currentUserId != null) {
       await _fetchUserFavorites(_currentUserId!);
     }
+    _fetchProducts();
   }
 
   Future<void> _fetchUserFavorites(String userId) async {
@@ -215,7 +219,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
     final String? authToken = prefs.getString('authToken');
 
     if (authToken == null) {
-      print('Auth Token not found. Could not fetch favorites.');
+      print('Auth Token not found. Favorites could not be fetched.');
       return;
     }
 
@@ -237,15 +241,15 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
               favoriteData.map<int>((item) => item['productId'] as int).toSet();
         });
         print(
-          'Favorite product IDs fetched successfully: $_favoriteProductIds',
+          'Favorite product IDs successfully fetched: $_favoriteProductIds',
         );
       } else {
         print(
-          'Error fetching favorite products: ${response.statusCode} - ${response.body}',
+          'Failed to fetch favorite products: ${response.statusCode} - ${response.body}',
         );
       }
     } catch (e) {
-      print('Network error fetching favorite products: $e');
+      print('Network error occurred while fetching favorite products: $e');
     }
   }
 
@@ -282,7 +286,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
       if (isCurrentlyFavorited) {
         final String deleteUrl =
             '$API_BASE_URL/api/Favorites/$_currentUserId/$productId';
-        print('Sending DELETE request: $deleteUrl');
+        print('Sending DELETE request to: $deleteUrl');
         response = await http.delete(
           Uri.parse(deleteUrl),
           headers: <String, String>{
@@ -297,7 +301,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
           productId: productId,
         );
         final String requestBody = jsonEncode(favorite.toJson());
-        print('Sending POST request: $postUrl with body: $requestBody');
+        print('Sending POST request to: $postUrl with body: $requestBody');
         response = await http.post(
           Uri.parse(postUrl),
           headers: <String, String>{
@@ -318,7 +322,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
           Colors.green,
         );
         print(
-          'Favorite operation successful: ${response.statusCode} - ${response.body}',
+          'Favorite operation success: ${response.statusCode} - ${response.body}',
         );
       } else {
         setState(() {
@@ -352,23 +356,15 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
     }
   }
 
-  Future<void> _searchProducts(String query) async {
-    if (query.trim().isEmpty) {
-      setState(() {
-        _searchResults = [];
-        _isLoading = false;
-      });
-      return;
-    }
+  Future<void> _fetchProducts() async {
+    if (_isLoading) return;
 
     setState(() {
       _isLoading = true;
-      _currentQuery = query;
-      _searchResults = [];
     });
 
     final String apiUrl =
-        '$API_BASE_URL/api/Product/search?searchTerm=${Uri.encodeComponent(query)}&PageNumber=1&PageSize=12';
+        '$API_BASE_URL/api/Product/most-favorited-paged?PageNumber=$_pageNumber&PageSize=$_pageSize';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -379,20 +375,24 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
             productsJson.map((json) => Product.fromJson(json)).toList();
 
         setState(() {
-          _searchResults = fetchedProducts;
+          _products.addAll(fetchedProducts);
+          _pageNumber++;
+          if (fetchedProducts.length < _pageSize) {
+            _hasMore = false;
+          }
         });
       } else {
         _showSnackBar(
-          'No products found matching your criteria.',
-          Colors.green,
+          'Failed to fetch products: ${response.statusCode}',
+          Colors.red,
         );
         print(
-          'Error loading search results: ${response.statusCode} - ${response.body}',
+          'Failed to load products: ${response.statusCode} - ${response.body}',
         );
       }
     } catch (e) {
       _showSnackBar('An error occurred: $e', Colors.red);
-      print('Error fetching search results: $e');
+      print('Error fetching products: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -413,59 +413,37 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: TextField(
-          controller: _searchController,
-          decoration: InputDecoration(
-            hintText: 'Search...',
-            hintStyle: GoogleFonts.poppins(color: ColorPalette.black70),
-            border: InputBorder.none,
-            suffixIcon:
-                _isLoading
-                    ? Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: LoadingAnimationWidget.hexagonDots(
-                          color: ColorPalette.primary,
-                          size: height * 0.03,
-                        ),
-                      ),
-                    )
-                    : IconButton(
-                      icon: Icon(Icons.search, color: ColorPalette.black),
-                      onPressed: () {
-                        _searchProducts(_searchController.text);
-                      },
-                    ),
+        centerTitle: true,
+        title: Text(
+          "Favorite Products",
+          style: GoogleFonts.poppins(
+            color: ColorPalette.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
           ),
-          style: GoogleFonts.poppins(color: ColorPalette.black, fontSize: 18),
-          onSubmitted: (value) {
-            _searchProducts(value);
-          },
-          textInputAction: TextInputAction.search,
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: ColorPalette.black,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: ColorPalette.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        backgroundColor: Colors.black,
         elevation: 0,
+        iconTheme: const IconThemeData(color: ColorPalette.white),
       ),
       body:
-          _isLoading && _searchResults.isEmpty && _currentQuery.isNotEmpty
+          _isLoading && _products.isEmpty
               ? Center(
                 child: LoadingAnimationWidget.hexagonDots(
                   color: ColorPalette.primary,
                   size: height * 0.05,
                 ),
               )
-              : _searchResults.isEmpty &&
-                  _currentQuery.isNotEmpty &&
-                  !_isLoading
-              ? const Center(
-                child: Text('No products found matching your criteria.'),
-              )
-              : _searchResults.isEmpty && _currentQuery.isEmpty && !_isLoading
-              ? const Center(child: Text('Enter a keyword to start searching.'))
+              : _products.isEmpty && !_isLoading
+              ? const Center(child: Text('No favorite products found.'))
               : GridView.builder(
+                controller: _scrollController,
                 padding: EdgeInsets.all(width * 0.04),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
@@ -473,16 +451,27 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                   mainAxisSpacing: height * 0.02,
                   childAspectRatio: 0.7,
                 ),
-                itemCount: _searchResults.length,
+                itemCount: _products.length + (_hasMore ? 1 : 0),
                 itemBuilder: (context, index) {
-                  final product = _searchResults[index];
+                  if (index == _products.length) {
+                    return _isLoading
+                        ? Center(
+                          child: LoadingAnimationWidget.hexagonDots(
+                            color: ColorPalette.primary,
+                            size: height * 0.05,
+                          ),
+                        )
+                        : const SizedBox.shrink();
+                  }
+                  final product = _products[index];
                   return GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder:
-                              (context) => ProductPage(productId: product.id),
+                              (context) =>
+                                  ProductPage(productId: _products[index].id),
                         ),
                       );
                     },
@@ -501,24 +490,20 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                           Stack(
                             alignment: Alignment.topLeft,
                             children: [
-                              ClipRRect(
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(6),
-                                  topRight: Radius.circular(6),
+                              Container(
+                                height: height * 0.15,
+                                decoration: const BoxDecoration(
+                                  color: Colors.transparent,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(6),
+                                    topRight: Radius.circular(6),
+                                  ),
                                 ),
-                                child: Container(
-                                  height: height * 0.15,
-                                  decoration: BoxDecoration(
-                                    color: Colors.transparent,
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(6),
-                                    ),
-                                  ),
-                                  child: Picture(
-                                    baseUrl:
-                                        "https://scuba-diving-s3-bucket.s3.eu-north-1.amazonaws.com/products",
-                                    fileName: "${product.name}-1",
-                                  ),
+                                alignment: Alignment.center,
+                                child: Picture(
+                                  baseUrl:
+                                      "https://scuba-diving-s3-bucket.s3.eu-north-1.amazonaws.com/products",
+                                  fileName: "${product.name}-1",
                                 ),
                               ),
                               IconButton(
@@ -540,7 +525,6 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                           Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 5.0,
-                              vertical: 5.0,
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

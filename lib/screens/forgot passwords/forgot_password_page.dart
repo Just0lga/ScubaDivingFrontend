@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:scuba_diving/colors/color_palette.dart';
 import 'package:scuba_diving/main.dart';
-import 'package:scuba_diving/screens/forgot%20passwords/verify_reset_code_page.dart'; // Ensure this path is correct
+import 'package:scuba_diving/screens/forgot%20passwords/verify_reset_code_page.dart';
 import 'package:scuba_diving/widgets/forgot_password_text_field.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -17,7 +17,7 @@ class ForgotPasswordPage extends StatefulWidget {
 
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final TextEditingController _emailController = TextEditingController();
-  bool _isLoading = false; // For loading state
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -25,7 +25,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     super.dispose();
   }
 
-  // Request to send password reset code
   Future<void> _sendResetCodeRequest() async {
     final String email = _emailController.text.trim();
 
@@ -35,7 +34,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     }
 
     setState(() {
-      _isLoading = true; // Start loading state
+      _isLoading = true;
     });
 
     final String apiUrl = '$API_BASE_URL/api/Auth/forgot-password';
@@ -54,7 +53,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           'A reset code has been sent to your email.',
           Colors.green,
         );
-        // Navigate to the code verification page, passing the email
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -78,12 +76,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       print('Error sending password reset request: $e');
     } finally {
       setState(() {
-        _isLoading = false; // End loading state
+        _isLoading = false;
       });
     }
   }
 
-  // Method to show a SnackBar notification to the user
   void _showSnackBar(String message, Color color) {
     ScaffoldMessenger.of(
       context,
@@ -131,10 +128,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               label: 'Email',
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
-              prefixIcon: Icon(
-                Icons.email,
-                color: ColorPalette.black,
-              ), // Changed icon color to black for visibility
+              prefixIcon: Icon(Icons.email, color: ColorPalette.black),
               hintText: 'example@email.com',
             ),
             SizedBox(height: height * 0.03),
@@ -146,9 +140,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 : ElevatedButton(
                   onPressed: _sendResetCodeRequest,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        ColorPalette.primary, // Button background color
-                    foregroundColor: ColorPalette.white, // Button text color
+                    backgroundColor: ColorPalette.primary,
+                    foregroundColor: ColorPalette.white,
                     padding: EdgeInsets.symmetric(
                       vertical: height * 0.015,
                       horizontal: width * 0.1,

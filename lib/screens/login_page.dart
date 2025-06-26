@@ -10,7 +10,7 @@ import 'package:scuba_diving/screens/main_page.dart';
 import 'package:scuba_diving/Widgets/scuba_text_field.dart';
 import 'package:scuba_diving/Widgets/scuba_title.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:jwt_decoder/jwt_decoder.dart'; // Yeni import
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class Loginpage extends StatefulWidget {
   const Loginpage({super.key});
@@ -58,15 +58,11 @@ class _LoginpageState extends State<Loginpage> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
 
-        // JWT token'ı al
         final String? token = responseData['token'] as String?;
 
         if (token != null && token.isNotEmpty) {
-          // JWT token'ı ayrıştır
           Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
 
-          // userId'yi 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier' claim'inden al
-          // Bu claim genellikle kullanıcının benzersiz ID'sini temsil eder.
           final String? userId =
               decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']
                   as String?;
@@ -75,24 +71,20 @@ class _LoginpageState extends State<Loginpage> {
             await prefs.setString('userId', userId);
             print('userId Shared Preferences\'a kaydedildi: $userId');
 
-            // Token'ı da kaydetmek isteyebilirsiniz, API'ye yapacağınız yetkili istekler için kullanılabilir.
             await prefs.setString('authToken', token);
             print('Auth Token Shared Preferences\'a kaydedildi.');
           } else {
             print(
               'Uyarı: JWT içindeki userId (nameidentifier claim) bulunamadı veya boştu.',
             );
-            _errorMessage =
-                'Kullanıcı ID bilgisi alınamadı.'; // Kullanıcıya gösterilecek hata
+            _errorMessage = 'Kullanıcı ID bilgisi alınamadı.';
           }
         } else {
           print('Uyarı: Response body\'sinde JWT token bulunamadı veya boştu.');
-          _errorMessage =
-              'Giriş token\'ı alınamadı.'; // Kullanıcıya gösterilecek hata
+          _errorMessage = 'Giriş token\'ı alınamadı.';
         }
 
         if (_errorMessage == null) {
-          // Eğer bir hata oluşmadıysa yönlendir
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => MainPage()),

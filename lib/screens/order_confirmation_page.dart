@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:scuba_diving/colors/color_palette.dart';
-import 'package:scuba_diving/screens/main_page.dart'; // For navigating back to the Main page
+import 'package:scuba_diving/screens/main_page.dart';
 
 class OrderConfirmationPage extends StatelessWidget {
-  final bool isSuccess; // Is the order successful?
-  final int? orderId; // Order ID if successful
-  final String? errorMessage; // Error message if failed
+  final bool isSuccess;
+  final int? orderId;
+  final String? errorMessage;
 
   const OrderConfirmationPage({
     super.key,
@@ -22,17 +22,12 @@ class OrderConfirmationPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          isSuccess ? "Order Confirmation" : "Order Error", // Translated
-          style: GoogleFonts.poppins(
-            color: ColorPalette.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          isSuccess ? "Order Confirmation" : "Order Error",
+          style: GoogleFonts.poppins(color: ColorPalette.white, fontSize: 24),
         ),
         centerTitle: true,
         backgroundColor: Colors.black,
         elevation: 0,
-        // Prevent user from dismissing this page with the back button (should navigate to LoginPage if needed)
         automaticallyImplyLeading: false,
       ),
       body: Center(
@@ -49,8 +44,8 @@ class OrderConfirmationPage extends StatelessWidget {
               SizedBox(height: height * 0.03),
               Text(
                 isSuccess
-                    ? "Your order has been placed successfully!" // Translated
-                    : "An error occurred while placing your order!", // Translated
+                    ? "Your order has been placed successfully!"
+                    : "An error occurred while placing your order!",
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   color: isSuccess ? ColorPalette.black : Colors.red,
@@ -60,7 +55,7 @@ class OrderConfirmationPage extends StatelessWidget {
               ),
               if (isSuccess)
                 Text(
-                  "Order ID: #${orderId ?? 'N/A'}", // Translated
+                  "Order ID: #${orderId ?? 'N/A'}",
                   style: GoogleFonts.poppins(
                     color: ColorPalette.black70,
                     fontSize: 16,
@@ -69,7 +64,7 @@ class OrderConfirmationPage extends StatelessWidget {
                 ),
               if (!isSuccess && errorMessage != null)
                 Text(
-                  "Error Detail: ${errorMessage!}", // Translated
+                  "Error Detail: ${errorMessage!}",
                   style: GoogleFonts.poppins(
                     color: Colors.red.shade700,
                     fontSize: 14,
@@ -79,12 +74,9 @@ class OrderConfirmationPage extends StatelessWidget {
               SizedBox(height: height * 0.04),
               ElevatedButton(
                 onPressed: () {
-                  // Navigate to Main Page, clearing all previous routes
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => MainPage(),
-                    ), // Using MainPage as per your import
+                    MaterialPageRoute(builder: (context) => MainPage()),
                     (Route<dynamic> route) => false,
                   );
                 },
@@ -100,7 +92,7 @@ class OrderConfirmationPage extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  "Return to Main Page", // Translated
+                  "Return to Main Page",
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

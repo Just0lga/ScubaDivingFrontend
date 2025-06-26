@@ -50,7 +50,7 @@ class _PictureState extends State<Picture> {
       child: SizedBox.expand(
         child: Image.network(
           currentUrl,
-          key: ValueKey(currentUrl), // URL değiştikçe widget tamamen yenilenir
+          key: ValueKey(currentUrl),
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
             Future.microtask(tryNextImage);

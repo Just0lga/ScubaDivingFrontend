@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:scuba_diving/colors/color_palette.dart';
 import 'package:scuba_diving/main.dart';
 import 'package:scuba_diving/models/address.dart';
@@ -47,13 +48,12 @@ class _AddressFormPageState extends State<AddressFormPage> {
       _authToken = prefs.getString('authToken');
     });
     if (_authToken == null) {
-      // Handle case where auth token is missing (e.g., redirect to login)
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Authentication token missing. Please log in.'),
         ),
       );
-      Navigator.pop(context); // Go back if no token
+      Navigator.pop(context);
     }
   }
 
@@ -76,7 +76,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
     });
 
     final Address newOrUpdatedAddress = Address(
-      id: widget.address?.id, // ID will be null for new address
+      id: widget.address?.id,
       userId: widget.userId,
       title: _titleController.text,
       fullAddress: _fullAddressController.text,
@@ -93,7 +93,6 @@ class _AddressFormPageState extends State<AddressFormPage> {
 
     try {
       if (widget.address == null) {
-        // Add new address
         apiUrl = '$API_BASE_URL/api/Address';
         response = await http.post(
           Uri.parse(apiUrl),
@@ -104,7 +103,6 @@ class _AddressFormPageState extends State<AddressFormPage> {
           body: jsonEncode(body),
         );
       } else {
-        // Update existing address
         apiUrl =
             '$API_BASE_URL/api/Address/${widget.userId}/${widget.address!.id}';
         response = await http.put(
@@ -128,7 +126,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
             backgroundColor: ColorPalette.success,
           ),
         );
-        widget.onSave(true); // Notify parent to refresh
+        widget.onSave(true);
         Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -326,11 +324,10 @@ class _AddressFormPageState extends State<AddressFormPage> {
   }
 }
 
-// Forward declaration for AddressFormPage
 class AddressFormPage extends StatefulWidget {
   final Address? address;
-  final String userId; // Pass userId to the form
-  final Function(bool) onSave; // Callback to notify parent on save
+  final String userId;
+  final Function(bool) onSave;
 
   const AddressFormPage({
     Key? key,
@@ -355,7 +352,7 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
   bool _isLoading = true;
   String? _currentUserId;
   String _errorMessage = '';
-  String? _authToken; // Store auth token
+  String? _authToken;
 
   @override
   void initState() {
@@ -399,7 +396,7 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
         Uri.parse(apiUrl),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $_authToken', // Use bearer token
+          'Authorization': 'Bearer $_authToken',
         },
       );
 
@@ -456,7 +453,9 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
 
     if (_currentUserId == null || _authToken == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Authentication error. Cannot delete address.')),
+        const SnackBar(
+          content: Text('Authentication error. Cannot delete address.'),
+        ),
       );
       setState(() {
         _isLoading = false;
@@ -473,11 +472,10 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
       );
 
       if (response.statusCode == 200 || response.statusCode == 204) {
-        // 200 OK or 204 No Content are common for successful DELETE
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Address deleted successfully!')),
         );
-        _fetchAddresses(); // Refresh the list
+        _fetchAddresses();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -500,7 +498,7 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
 
   Future<void> _handleAddressFormSave(bool needsRefresh) async {
     if (needsRefresh) {
-      await _fetchAddresses(); // Refresh addresses after add/edit
+      await _fetchAddresses();
     }
   }
 
@@ -525,8 +523,7 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
           },
         ),
         actions: [
-          if (_currentUserId !=
-              null) // Only show add button if user is logged in
+          if (_currentUserId != null)
             IconButton(
               icon: const Icon(Icons.add, color: ColorPalette.white),
               onPressed: () {
@@ -582,7 +579,7 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    color: ColorPalette.cardColor,
+                    color: ColorPalette.white,
                     child: Padding(
                       padding: const EdgeInsets.only(
                         left: 16.0,

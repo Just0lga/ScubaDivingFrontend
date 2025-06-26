@@ -11,7 +11,7 @@ import 'package:scuba_diving/models/product.dart';
 import 'package:scuba_diving/models/review.dart';
 import 'package:scuba_diving/screens/picture/picture.dart';
 import 'package:scuba_diving/screens/product_comments_page.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // SharedPreferences için eklendi
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProductPage extends StatefulWidget {
   final int productId;
@@ -27,12 +27,11 @@ class _ProductPageState extends State<ProductPage> {
   bool _isLoading = true;
   String _errorMessage = '';
 
-  // Favori ve Sepet için yeni state değişkenleri
   String? _currentUserId;
   Set<int> _favoriteProductIds = {};
   Set<int> _cartProductIds = {};
-  bool _isFavorite = false; // Mevcut ürün favori mi?
-  bool _isInCart = false; // Mevcut ürün sepette mi?
+  bool _isFavorite = false;
+  bool _isInCart = false;
   double _averageRating = 0.0;
   int _reviewCount = 0;
 
@@ -48,7 +47,7 @@ class _ProductPageState extends State<ProductPage> {
           .get(
             Uri.parse('$API_BASE_URL/api/Review/product/${widget.productId}'),
           )
-          .timeout(const Duration(seconds: 10)); // Zaman aşımı eklendi
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final List<dynamic> reviewJsonList = json.decode(response.body);
@@ -109,12 +108,11 @@ class _ProductPageState extends State<ProductPage> {
   void initState() {
     super.initState();
     _fetchProductDetails();
-    _loadUserDataAndFavorites(); // Favorileri çek
-    _loadUserDataAndCartItems(); // Sepet öğelerini çek
+    _loadUserDataAndFavorites();
+    _loadUserDataAndCartItems();
     _fetchProductReviews();
   }
 
-  // Kullanıcı ID'sini yükle ve favorileri çek
   Future<void> _loadUserDataAndFavorites() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -123,14 +121,12 @@ class _ProductPageState extends State<ProductPage> {
 
     if (_currentUserId != null) {
       await _fetchUserFavorites(_currentUserId!);
-      // Favori listesi çekildikten sonra mevcut ürünün favori olup olmadığını kontrol et
       setState(() {
         _isFavorite = _favoriteProductIds.contains(widget.productId);
       });
     }
   }
 
-  // Kullanıcı ID'sini yükle ve sepet öğelerini çek
   Future<void> _loadUserDataAndCartItems() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -139,20 +135,18 @@ class _ProductPageState extends State<ProductPage> {
 
     if (_currentUserId != null) {
       await _fetchUserCartItems(_currentUserId!);
-      // Sepet listesi çekildikten sonra mevcut ürünün sepette olup olmadığını kontrol et
       setState(() {
         _isInCart = _cartProductIds.contains(widget.productId);
       });
     }
   }
 
-  // Kullanıcının favori ürünlerini backend'den çek
   Future<void> _fetchUserFavorites(String userId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? authToken = prefs.getString('authToken');
 
     if (authToken == null) {
-      print('Auth Token bulunamadı. Favoriler çekilemedi.');
+      print('Auth Token not found. Favorites could not be fetched.');
       return;
     }
 
@@ -172,28 +166,27 @@ class _ProductPageState extends State<ProductPage> {
         setState(() {
           _favoriteProductIds =
               favoriteData.map<int>((item) => item['productId'] as int).toSet();
-          _isFavorite = _favoriteProductIds.contains(
-            widget.productId,
-          ); // Sayfa yüklendiğinde favori durumunu güncelle
+          _isFavorite = _favoriteProductIds.contains(widget.productId);
         });
-        print('Favori ürün ID\'leri başarıyla çekildi: $_favoriteProductIds');
+        print(
+          'Favorite product IDs successfully fetched: $_favoriteProductIds',
+        );
       } else {
         print(
-          'Favori ürünleri çekilirken hata oluştu: ${response.statusCode} - ${response.body}',
+          'Failed to fetch favorite products: ${response.statusCode} - ${response.body}',
         );
       }
     } catch (e) {
-      print('Favori ürünleri çekilirken ağ hatası oluştu: $e');
+      print('Network error occurred while fetching favorite products: $e');
     }
   }
 
-  // Kullanıcının sepet öğelerini backend'den çek
   Future<void> _fetchUserCartItems(String userId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? authToken = prefs.getString('authToken');
 
     if (authToken == null) {
-      print('Auth Token bulunamadı. Sepet öğeleri çekilemedi.');
+      print('Auth Token not found. Cart items could not be fetched.');
       return;
     }
 
@@ -213,18 +206,16 @@ class _ProductPageState extends State<ProductPage> {
         setState(() {
           _cartProductIds =
               cartData.map<int>((item) => item['productId'] as int).toSet();
-          _isInCart = _cartProductIds.contains(
-            widget.productId,
-          ); // Sayfa yüklendiğinde sepet durumunu güncelle
+          _isInCart = _cartProductIds.contains(widget.productId);
         });
-        print('Cart ürün ID\'leri başarıyla çekildi: $_cartProductIds');
+        print('Cart product IDs successfully fetched: $_cartProductIds');
       } else {
         print(
-          'Cart ürünleri çekilirken hata oluştu: ${response.statusCode} - ${response.body}',
+          'Failed to fetch cart items: ${response.statusCode} - ${response.body}',
         );
       }
     } catch (e) {
-      print('Cart ürünleri çekilirken ağ hatası oluştu: $e');
+      print('Network error occurred while fetching cart items: $e');
     }
   }
 
@@ -254,12 +245,12 @@ class _ProductPageState extends State<ProductPage> {
     }
   }
 
-  // Favoriye ekleme/çıkarma fonksiyonu
   Future<void> _toggleFavorite() async {
     if (_currentUserId == null) {
-      // Kullanıcı giriş yapmamışsa uyarı göster veya giriş sayfasına yönlendir
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Favorilere eklemek için giriş yapmalısınız.')),
+        const SnackBar(
+          content: Text('You must be logged in to add to favorites.'),
+        ),
       );
       return;
     }
@@ -268,10 +259,10 @@ class _ProductPageState extends State<ProductPage> {
     final String? authToken = prefs.getString('authToken');
 
     if (authToken == null) {
-      print('Auth Token bulunamadı. Favori işlemi yapılamadı.');
+      print('Auth Token not found. Favorite operation could not be performed.');
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Yetkilendirme hatası.')));
+      ).showSnackBar(const SnackBar(content: Text('Authentication error.')));
       return;
     }
 
@@ -284,18 +275,16 @@ class _ProductPageState extends State<ProductPage> {
     try {
       http.Response response;
       if (_isFavorite) {
-        // Favorilerden çıkar
         response = await http.delete(
           Uri.parse(
             '$API_BASE_URL/api/Favorites/$_currentUserId/${widget.productId}',
-          ), // CORRECTED URL
+          ),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
             'Authorization': 'Bearer $authToken',
           },
         );
       } else {
-        // Favorilere ekle
         response = await http.post(
           Uri.parse(apiUrl),
           headers: <String, String>{
@@ -307,7 +296,6 @@ class _ProductPageState extends State<ProductPage> {
       }
 
       if (response.statusCode == 200 || response.statusCode == 204) {
-        // 204 No Content is common for successful DELETE
         setState(() {
           _isFavorite = !_isFavorite;
           if (_isFavorite) {
@@ -320,43 +308,42 @@ class _ProductPageState extends State<ProductPage> {
           SnackBar(
             content: Text(
               _isFavorite
-                  ? 'Ürün favorilere eklendi!'
-                  : 'Ürün favorilerden çıkarıldı.',
+                  ? 'Product added to favorites!'
+                  : 'Product removed from favorites.',
             ),
           ),
         );
-        // Favori sayısı da güncellenmeli (ürün modelinde favoriteCount alanı varsa)
-        // Eğer ürün modelinizde favoriteCount doğrudan güncellenmiyorsa, yeniden fetch etmeniz gerekebilir.
-        _fetchProductDetails(); // FavoriteCount'u güncellemek için ürünü tekrar çek
+        _fetchProductDetails();
       } else {
         print(
-          'Favori işlemi başarısız: ${response.statusCode} - ${response.body}',
+          'Favorite operation failed: ${response.statusCode} - ${response.body}',
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Favori işlemi başarısız oldu.')),
+          const SnackBar(content: Text('Favorite operation failed.')),
         );
       }
     } catch (e) {
-      print('Favori işlemi sırasında ağ hatası: $e');
+      print('Network error during favorite operation: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Favori işlemi sırasında bir hata oluştu.')),
+        const SnackBar(
+          content: Text('An error occurred during favorite operation.'),
+        ),
       );
     }
   }
 
-  // Sepete ekleme fonksiyonu
   Future<void> _addToCart() async {
     if (_currentUserId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sepete eklemek için giriş yapmalısınız.')),
+        const SnackBar(content: Text('You must be logged in to add to cart.')),
       );
       return;
     }
 
     if (_isInCart) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Bu ürün zaten sepetinizde.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('This product is already in your cart.')),
+      );
       return;
     }
 
@@ -364,10 +351,10 @@ class _ProductPageState extends State<ProductPage> {
     final String? authToken = prefs.getString('authToken');
 
     if (authToken == null) {
-      print('Auth Token bulunamadı. Sepete ekleme yapılamadı.');
+      print('Auth Token not found. Could not add to cart.');
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Yetkilendirme hatası.')));
+      ).showSnackBar(const SnackBar(content: Text('Authentication error.')));
       return;
     }
 
@@ -375,7 +362,7 @@ class _ProductPageState extends State<ProductPage> {
     final Map<String, dynamic> body = {
       'productId': widget.productId,
       'userId': _currentUserId,
-      'quantity': 1, // Varsayılan olarak 1 adet ekle
+      'quantity': 1,
     };
 
     try {
@@ -389,26 +376,23 @@ class _ProductPageState extends State<ProductPage> {
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        // 201 Created veya 200 OK
         setState(() {
           _isInCart = true;
           _cartProductIds.add(widget.productId);
         });
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Ürün sepete eklendi!')));
+        ).showSnackBar(const SnackBar(content: Text('Product added to cart!')));
       } else {
-        print(
-          'Sepete ekleme başarısız: ${response.statusCode} - ${response.body}',
-        );
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sepete ekleme başarısız oldu.')),
-        );
+        print('Add to cart failed: ${response.statusCode} - ${response.body}');
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Failed to add to cart.')));
       }
     } catch (e) {
-      print('Sepete ekleme sırasında ağ hatası: $e');
+      print('Network error during add to cart: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sepete ekleme sırasında bir hata oluştu.')),
+        const SnackBar(content: Text('An error occurred during add to cart.')),
       );
     }
   }
@@ -446,24 +430,20 @@ class _ProductPageState extends State<ProductPage> {
                         children: [
                           IconButton(
                             onPressed: () {
-                              Navigator.pop(
-                                context,
-                                true,
-                              ); // Pass true to indicate an update might be needed
+                              Navigator.pop(context, true);
                             },
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.arrow_back_ios,
                               color: Colors.black,
                             ),
                           ),
-                          // Favori Butonu
                           Container(
                             decoration: BoxDecoration(
                               color: ColorPalette.cardColor,
                               shape: BoxShape.circle,
                             ),
                             child: IconButton(
-                              onPressed: _toggleFavorite, // Favori fonksiyonu
+                              onPressed: _toggleFavorite,
                               icon: Icon(
                                 _isFavorite
                                     ? Icons.favorite
@@ -474,10 +454,10 @@ class _ProductPageState extends State<ProductPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Container(
                         height: height * 0.4,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Colors.transparent,
                           borderRadius: BorderRadius.all(Radius.circular(6)),
                         ),
@@ -487,7 +467,7 @@ class _ProductPageState extends State<ProductPage> {
                           fileName: "${_product?.name}-1",
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         _product!.name,
                         style: GoogleFonts.poppins(
@@ -527,7 +507,7 @@ class _ProductPageState extends State<ProductPage> {
                               ignoreGestures: true,
                             ),
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -549,7 +529,7 @@ class _ProductPageState extends State<ProductPage> {
                               ),
                               width: width * 0.45,
                               height: height * 0.05,
-                              child: Padding(
+                              child: const Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 12),
                                 child: Row(
                                   mainAxisAlignment:
@@ -557,7 +537,7 @@ class _ProductPageState extends State<ProductPage> {
                                   children: [
                                     Text(
                                       "Show the comments",
-                                      style: GoogleFonts.poppins(
+                                      style: TextStyle(
                                         fontSize: 10,
                                         color: ColorPalette.primary,
                                       ),
@@ -590,18 +570,18 @@ class _ProductPageState extends State<ProductPage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "${_product!.favoriteCount ?? 0}", // Null kontrolü ekleyin
+                                  "${_product!.favoriteCount ?? 0}",
                                   style: GoogleFonts.poppins(
                                     fontSize: 20,
                                     color: Colors.red,
                                   ),
                                 ),
-                                SizedBox(width: 4),
-                                Icon(Icons.favorite, color: Colors.red),
+                                const SizedBox(width: 4),
+                                const Icon(Icons.favorite, color: Colors.red),
                               ],
                             ),
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(6),
@@ -614,13 +594,13 @@ class _ProductPageState extends State<ProductPage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "${_product!.reviewCount ?? 0}", // Null kontrolü ekleyin
+                                  "${_product!.reviewCount ?? 0}",
                                   style: GoogleFonts.poppins(
                                     fontSize: 20,
                                     color: Colors.grey[700],
                                   ),
                                 ),
-                                SizedBox(width: 4),
+                                const SizedBox(width: 4),
                                 Icon(Icons.reviews, color: Colors.grey[700]),
                               ],
                             ),
@@ -655,7 +635,6 @@ class _ProductPageState extends State<ProductPage> {
                         ),
                       ),
                       SizedBox(height: height * 0.03),
-                      // --- ÜRÜN ÖZELLİKLERİ BAŞLANGICI ---
                       if (_product!.features != null &&
                           _product!.features!.isNotEmpty)
                         Column(
@@ -669,19 +648,19 @@ class _ProductPageState extends State<ProductPage> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
                             ..._product!.features!.entries.map((entry) {
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 5.0),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.check_circle_outline,
                                       size: 18,
                                       color: ColorPalette.primary,
                                     ),
-                                    SizedBox(width: 8),
+                                    const SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
                                         '${entry.key}: ${entry.value}',
@@ -697,11 +676,9 @@ class _ProductPageState extends State<ProductPage> {
                             }).toList(),
                           ],
                         ),
-                      // --- ÜRÜN ÖZELLİKLERİ SONU ---
                       SizedBox(height: height * 0.03),
                       GestureDetector(
-                        // Sepete Ekle butonu için GestureDetector eklendi
-                        onTap: _addToCart, // Sepete ekleme fonksiyonu
+                        onTap: _isInCart ? null : _addToCart,
                         child: Container(
                           height: height * 0.08,
                           width: width,
@@ -709,15 +686,10 @@ class _ProductPageState extends State<ProductPage> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(6),
                             color:
-                                _isInCart
-                                    ? Colors.grey
-                                    : ColorPalette
-                                        .primary, // Sepetteyse rengi değiştir
+                                _isInCart ? Colors.grey : ColorPalette.primary,
                           ),
                           child: Text(
-                            _isInCart
-                                ? "In Cart"
-                                : "Add to cart", // Sepetteyse metni değiştir
+                            _isInCart ? "In Cart" : "Add to cart",
                             style: GoogleFonts.poppins(
                               fontSize: 20,
                               color: Colors.white,
