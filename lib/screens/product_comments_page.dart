@@ -310,10 +310,7 @@ class _ProductCommentsPageState extends State<ProductCommentsPage> {
         appBar: AppBar(
           title: Text(
             "Reviews",
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.bold,
-              color: ColorPalette.white,
-            ),
+            style: GoogleFonts.poppins(color: ColorPalette.white),
           ),
           centerTitle: true,
           backgroundColor: ColorPalette.black,

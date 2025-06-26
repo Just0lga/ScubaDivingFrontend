@@ -132,10 +132,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       appBar: AppBar(
         title: Text(
           'Order #${widget.order.id} Details',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-            color: ColorPalette.white,
-          ),
+          style: GoogleFonts.poppins(color: ColorPalette.white),
         ),
         centerTitle: true,
         backgroundColor: ColorPalette.black,

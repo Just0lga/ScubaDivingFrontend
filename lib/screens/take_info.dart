@@ -20,11 +20,7 @@ class TakeInfo extends StatelessWidget {
         iconTheme: const IconThemeData(color: ColorPalette.white),
         title: Text(
           'Scuba Diving Info',
-          style: GoogleFonts.poppins(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: ColorPalette.white,
-          ),
+          style: GoogleFonts.poppins(fontSize: 22, color: ColorPalette.white),
         ),
         backgroundColor: ColorPalette.black,
       ),

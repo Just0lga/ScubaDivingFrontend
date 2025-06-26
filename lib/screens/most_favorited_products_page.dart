@@ -416,11 +416,7 @@ class _MostFavoritedProductsPageState extends State<MostFavoritedProductsPage> {
         centerTitle: true,
         title: Text(
           "Favorite Products",
-          style: GoogleFonts.poppins(
-            color: ColorPalette.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          style: GoogleFonts.poppins(color: ColorPalette.white, fontSize: 24),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: ColorPalette.white),

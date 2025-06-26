@@ -169,10 +169,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
       appBar: AppBar(
         title: Text(
           widget.address == null ? 'Add New Address' : 'Edit Address',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-            color: ColorPalette.white,
-          ),
+          style: GoogleFonts.poppins(color: ColorPalette.white),
         ),
         centerTitle: true,
         backgroundColor: ColorPalette.black,
@@ -508,10 +505,7 @@ class _AddressManagementPageState extends State<AddressManagementPage> {
       appBar: AppBar(
         title: Text(
           'My Addresses',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-            color: ColorPalette.white,
-          ),
+          style: GoogleFonts.poppins(color: ColorPalette.white),
         ),
         centerTitle: true,
         backgroundColor: ColorPalette.black,

@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:scuba_diving/colors/color_palette.dart';
 import 'package:scuba_diving/screens/category_page.dart';
@@ -15,6 +16,9 @@ String? API_BASE_URL;
 void main() async {
   HttpOverrides.global = MyHttpOverrides();
   API_BASE_URL = 'https://justolga.site/api';
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   runApp(const MyApp());
 }

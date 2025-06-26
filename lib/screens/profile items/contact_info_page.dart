@@ -25,11 +25,8 @@ class ContactInfoPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Contact Me',
-          style: GoogleFonts.poppins(
-            color: ColorPalette.white,
-            fontWeight: FontWeight.bold,
-          ),
+          'Contact Us',
+          style: GoogleFonts.poppins(color: ColorPalette.white),
         ),
         centerTitle: true,
         backgroundColor: ColorPalette.black,

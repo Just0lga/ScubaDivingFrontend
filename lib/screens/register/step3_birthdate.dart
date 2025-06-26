@@ -22,6 +22,7 @@ class Step3BirthDate extends StatefulWidget {
 
 class _Step3BirthDateState extends State<Step3BirthDate> {
   DateTime? selectedDate;
+  String? _errorText;
 
   @override
   void initState() {
@@ -58,6 +59,7 @@ class _Step3BirthDateState extends State<Step3BirthDate> {
     if (picked != null) {
       setState(() {
         selectedDate = picked;
+        _errorText = null;
       });
     }
   }
@@ -66,6 +68,10 @@ class _Step3BirthDateState extends State<Step3BirthDate> {
     if (selectedDate != null) {
       widget.formData["birthDate"] = selectedDate;
       widget.onNext();
+    } else {
+      setState(() {
+        _errorText = "Please select your birth date.";
+      });
     }
   }
 
@@ -117,6 +123,14 @@ class _Step3BirthDateState extends State<Step3BirthDate> {
             ),
           ),
         ),
+        if (_errorText != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              _errorText!,
+              style: const TextStyle(color: Colors.redAccent, fontSize: 14),
+            ),
+          ),
         const SizedBox(height: 40),
         CircleNextButton(onPressed: _continue),
       ],

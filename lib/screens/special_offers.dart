@@ -415,12 +415,8 @@ class _SpecialOffersPageState extends State<SpecialOffers> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          "Favorite Products",
-          style: GoogleFonts.poppins(
-            color: ColorPalette.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          "Special Offers",
+          style: GoogleFonts.poppins(color: ColorPalette.white, fontSize: 24),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: ColorPalette.white),

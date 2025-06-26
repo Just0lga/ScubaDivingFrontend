@@ -40,11 +40,7 @@ class _LanguagesPageState extends State<LanguagesPage> {
         ),
         title: Text(
           "Languages",
-          style: GoogleFonts.poppins(
-            color: ColorPalette.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          style: GoogleFonts.poppins(color: ColorPalette.white, fontSize: 24),
         ),
         backgroundColor: Colors.black,
         elevation: 0,

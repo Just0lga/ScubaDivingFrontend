@@ -67,7 +67,6 @@ class Step2Name extends StatefulWidget {
 }
 
 class _Step2NameState extends State<Step2Name> {
-  // Form durumunu yönetmek için GlobalKey
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   late TextEditingController firstNameController;
@@ -95,9 +94,7 @@ class _Step2NameState extends State<Step2Name> {
   }
 
   void _continue() {
-    // Formun geçerliliğini kontrol et
     if (_formKey.currentState?.validate() ?? false) {
-      // Validasyon başarılı ise verileri güncelle ve bir sonraki adıma geç
       widget.formData["email"] = emailController.text.trim();
       widget.formData["firstName"] = firstNameController.text.trim();
       widget.formData["lastName"] = lastNameController.text.trim();
@@ -108,8 +105,7 @@ class _Step2NameState extends State<Step2Name> {
   @override
   Widget build(BuildContext context) {
     return Form(
-      // Form widget'ı eklendi
-      key: _formKey, // GlobalKey atandı
+      key: _formKey,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -122,7 +118,6 @@ class _Step2NameState extends State<Step2Name> {
             ),
           ),
           const SizedBox(height: 32),
-          // UnderlineTextField yerine CustomUnderlineTextFormField kullanıldı
           CustomUnderlineTextFormField(
             label: "Email",
             controller: emailController,
@@ -130,13 +125,12 @@ class _Step2NameState extends State<Step2Name> {
             color2: ColorPalette.white70,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Email boş bırakılamaz';
+                return 'Email cannot be empty';
               }
-              // Basit bir email format kontrolü
               if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                return 'Geçerli bir email adresi girin';
+                return 'Enter a valid email address';
               }
-              return null; // Geçerliyse null döndür
+              return null;
             },
           ),
           const SizedBox(height: 20),
@@ -147,7 +141,7 @@ class _Step2NameState extends State<Step2Name> {
             color2: ColorPalette.white70,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'İsim boş bırakılamaz';
+                return 'First name cannot be empty';
               }
               return null;
             },
@@ -160,7 +154,7 @@ class _Step2NameState extends State<Step2Name> {
             color2: ColorPalette.white70,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Soyisim boş bırakılamaz';
+                return 'Last name cannot be empty';
               }
               return null;
             },

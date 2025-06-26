@@ -352,10 +352,8 @@ class _CategoryPageState extends State<CategoryPage> {
           }
         });
       } else {
-        _showSnackBar(
-          'Failed to fetch products: ${response.statusCode}',
-          Colors.red,
-        );
+        print('Failed to fetch products: ${response.statusCode}');
+        _showSnackBar("No products found in this category", Colors.green);
       }
     } catch (e) {
       _showSnackBar('An error occurred: $e', Colors.red);
@@ -382,11 +380,7 @@ class _CategoryPageState extends State<CategoryPage> {
         centerTitle: true,
         title: Text(
           widget.categoryTitle,
-          style: GoogleFonts.poppins(
-            color: ColorPalette.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          style: GoogleFonts.poppins(color: ColorPalette.white, fontSize: 24),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: ColorPalette.white),

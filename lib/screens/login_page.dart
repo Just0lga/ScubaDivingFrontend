@@ -69,19 +69,19 @@ class _LoginpageState extends State<Loginpage> {
 
           if (userId != null && userId.isNotEmpty) {
             await prefs.setString('userId', userId);
-            print('userId Shared Preferences\'a kaydedildi: $userId');
+            print('userId saved to Shared Preferences: $userId');
 
             await prefs.setString('authToken', token);
-            print('Auth Token Shared Preferences\'a kaydedildi.');
+            print('Auth Token saved to Shared Preferences.');
           } else {
             print(
-              'Uyarı: JWT içindeki userId (nameidentifier claim) bulunamadı veya boştu.',
+              'Warning: userId (nameidentifier claim) not found or empty in JWT.',
             );
-            _errorMessage = 'Kullanıcı ID bilgisi alınamadı.';
+            _errorMessage = 'Failed to retrieve user ID.';
           }
         } else {
-          print('Uyarı: Response body\'sinde JWT token bulunamadı veya boştu.');
-          _errorMessage = 'Giriş token\'ı alınamadı.';
+          print('Warning: JWT token not found or empty in response body.');
+          _errorMessage = 'Failed to retrieve login token.';
         }
 
         if (_errorMessage == null) {
@@ -91,12 +91,12 @@ class _LoginpageState extends State<Loginpage> {
           );
         }
       } else {
-        String message = 'Giriş başarısız';
+        String message = 'Login failed';
         try {
           final body = jsonDecode(response.body);
           message = body['message'] ?? message;
         } catch (e) {
-          print('Uyarı: Response body JSON olarak ayrıştırılamadı: $e');
+          print('Warning: Response body could not be parsed as JSON: $e');
         }
         setState(() {
           _errorMessage = message;
@@ -104,7 +104,7 @@ class _LoginpageState extends State<Loginpage> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Hata: $e';
+        _errorMessage = 'Error: $e';
       });
     } finally {
       setState(() {

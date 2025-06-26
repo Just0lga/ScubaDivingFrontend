@@ -10,12 +10,12 @@ class ScubaTitle extends StatelessWidget {
       children: [
         Text(
           "Scuba Living",
-          style: GoogleFonts.poppins(color: color, fontSize: 50, height: 1.1),
+          style: GoogleFonts.poppins(color: color, fontSize: 40, height: 1.1),
         ),
         Text(
           "Life Begins Below the Surface",
           textAlign: TextAlign.center,
-          style: GoogleFonts.poppins(color: color, fontSize: 15),
+          style: GoogleFonts.poppins(color: color, fontSize: 12),
         ),
       ],
     );

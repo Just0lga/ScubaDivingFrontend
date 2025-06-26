@@ -137,10 +137,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
       appBar: AppBar(
         title: Text(
           'My Orders',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-            color: ColorPalette.white,
-          ),
+          style: GoogleFonts.poppins(color: ColorPalette.white),
         ),
         centerTitle: true,
         backgroundColor: ColorPalette.black,

@@ -326,11 +326,7 @@ class _PaymentPageState extends State<PaymentPage> {
       appBar: AppBar(
         title: Text(
           "Payment",
-          style: GoogleFonts.poppins(
-            color: ColorPalette.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          style: GoogleFonts.poppins(color: ColorPalette.white, fontSize: 24),
         ),
         centerTitle: true,
         backgroundColor: Colors.black,

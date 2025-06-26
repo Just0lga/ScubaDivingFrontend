@@ -419,12 +419,8 @@ class _TopViewedProductsPageState extends State<TopViewedProductsPage> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          "Most Viewed Products",
-          style: GoogleFonts.poppins(
-            color: ColorPalette.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          "Top Viewed Products",
+          style: GoogleFonts.poppins(color: ColorPalette.white, fontSize: 24),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: ColorPalette.white),
